@@ -7,7 +7,7 @@ app = Flask(__name__)
 api = Api(app)
 rs = RecommendationSystem()
  
-api.add_resource(Recommender, '/', resource_class_kwargs={'rs': rs})
+api.add_resource(Recommender, '/api/recommender/', resource_class_kwargs={'rs': rs})
 
 if __name__ =="__main__": 
     app.run(debug = True)

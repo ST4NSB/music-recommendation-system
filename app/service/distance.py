@@ -1,5 +1,6 @@
 from numpy import dot
 from numpy.linalg import norm
+import sys
 
 class Distance:
     @staticmethod
