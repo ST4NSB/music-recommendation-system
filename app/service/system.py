@@ -1,22 +1,25 @@
 
-from typing import List
+from typing import Dict, List, Tuple
 
-from numpy.core.fromnumeric import prod
+import requests, os
 from app.service.distance import Distance
 from app.service.utils import Utils
-import requests
-import os
+from collections import defaultdict
 
 class RecommendationSystem:
 
-    def __init__(self) -> None:
-        self._songs_dataset = {
-            'id1': ([1.0, 2.0, 3.0], 'fanfarlo'),
-            'id2': ([2.0, 3.0, 4.0], 'CHVRCHES - Death Stranding (Audio)'),
-            'id3': ([9.0, 4.0, 5.0], 'lol')
+    def __init__(self) -> None:        
+        self.cfg = Utils.get_config_settings()
+        self.__songs_dataset = {
+            'id1': ([9.0, 4.5, 4.0], 'fanfarlo'),
+            'id2': ([7.0, 6.0, 5.0], 'CHVRCHES - Death Stranding (Audio)'),
+            'id9': ([4.0, 5.0, 2.0], 'some stuff'),
+            'id3': ([9.0, 4.0, 5.0], 'Phoebe Bridgers - Full Performance'),
+            'id4': ([1.5, 2.5, 3.5], 'big thief - little things'),
+            'id5': ([3.0, 2.0, 3.0], 'test')
         }
 
-    def get_dataset_list() -> None:
+    def __get_processed_dataset() -> None:
         pass
 
     def get_next_song(self, processed_songs) -> float:
@@ -24,38 +27,36 @@ class RecommendationSystem:
         calculated = False
         songs_number = 10
 
-        res = self.get_closest_song_by_distance(processed_songs, distance_formula=Distance.get_euclidean_distance)
-        youtube_id = self.get_youtube_song_id(song_name=res['name'])
-        res['youtube_id'] = youtube_id
+        res, distances = self.__get_closest_song_by_distances(processed_songs, distance_formula=eval(self.cfg['distance_algorithm']['algorithm']), eval_func=eval(self.cfg['distance_algorithm']['eval_func']))
+        print(distances)
+        youtube_id = self.__get_youtube_videoId(song_name=res['name'])
+        res['youtubeId'] = youtube_id
         return res
-        
 
-    def get_closest_song_by_distance(self, processed_songs, distance_formula):
-        distances, liked_songs = {}, []
+    def __get_closest_song_by_distances(self, processed_songs, distance_formula, eval_func) -> Tuple:
+        distances, liked_songs = defaultdict(lambda: [0, '']), []
 
         for song in processed_songs['liked']:
-            liked_songs.append(self._songs_dataset[song][0])
+            liked_songs.append(self.__songs_dataset[song][0])
 
-        #print(f'{liked_songs}, {self._songs_dataset}', file=sys.stderr)
-        for id, details in self._songs_dataset.items(): 
-
-            if id in processed_songs['seen']:
+        for id, details in self.__songs_dataset.items(): 
+            if id in processed_songs['skipped']:
                 continue
 
             for liked_song in liked_songs:
                 dataset_feature = Utils.convert_to_numpy(details[0])
                 liked_feature = Utils.convert_to_numpy(liked_song)
 
-                distances[id] = (distance_formula(liked_feature, dataset_feature), details[1])
+                feature_sum = distance_formula(liked_feature, dataset_feature)
+                distances[id] = [distances[id][0] + feature_sum, details[1]]
 
-        print(f"distances: {distances}")
-        min_val = min(distances.items(), key=lambda x: x[0])
-        return {
+        min_val = eval_func(distances.items(), key=lambda x: x[1])
+        return ({
             "id": min_val[0], 
             "name": min_val[1][1]
-        }
+        }, distances)
     
-    def get_youtube_song_id(self, song_name):
+    def __get_youtube_videoId(self, song_name) -> str:
         API_KEY = os.getenv('API_KEY')
         url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&key={API_KEY}&type=video&q={song_name}"
 
