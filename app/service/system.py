@@ -27,8 +27,14 @@ class RecommendationSystem:
         calculated = False
         songs_number = 10
 
-        res, distances = self.__get_closest_song_by_distances(processed_songs, distance_formula=eval(self.cfg['distance_algorithm']['algorithm']), eval_func=eval(self.cfg['distance_algorithm']['eval_func']))
-        print(distances)
+        res, distances = self.__get_closest_song_by_distances(
+            processed_songs, 
+            distance_formula=eval(self.cfg['distance_algorithm']['algorithm']), 
+            eval_func=eval(self.cfg['distance_algorithm']['eval_func'])
+        )
+        
+        print(distances) # TODO # DELETE THIS LATER
+        
         youtube_id = self.__get_youtube_videoId(song_name=res['name'])
         res['youtubeId'] = youtube_id
         return res
@@ -44,8 +50,8 @@ class RecommendationSystem:
                 continue
 
             for liked_song in liked_songs:
-                dataset_feature = Utils.convert_to_numpy(details[0])
-                liked_feature = Utils.convert_to_numpy(liked_song)
+                dataset_feature = Utils.convert_to_numpy_array(details[0])
+                liked_feature = Utils.convert_to_numpy_array(liked_song)
 
                 feature_sum = distance_formula(liked_feature, dataset_feature)
                 distances[id] = [distances[id][0] + feature_sum, details[1]]

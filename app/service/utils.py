@@ -5,7 +5,7 @@ import yaml
 
 class Utils:
     @staticmethod
-    def convert_to_numpy(item) -> List[float]:
+    def convert_to_numpy_array(item) -> List[float]:
         return numpy.array(item).astype(numpy.float)
 
     @staticmethod
