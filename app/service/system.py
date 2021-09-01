@@ -1,7 +1,9 @@
 
+import csv
 from typing import Dict, List, Tuple
 
 import requests, os
+import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
 from collections import defaultdict
@@ -19,8 +21,12 @@ class RecommendationSystem:
             'id5': ([3.0, 2.0, 3.0], 'test')
         }
 
-    def __get_processed_dataset() -> None:
-        pass
+        self.x = self.__get_processed_dataset()
+
+    def __get_processed_dataset(self) -> None:
+        with open("data.csv", "r", encoding="utf8") as csvfile:
+            df = pd.read_csv(csvfile)
+        print(df.to_string()) # TODO delete this 
 
     def get_next_song(self, processed_songs) -> float:
 
@@ -35,8 +41,7 @@ class RecommendationSystem:
         
         print(distances) # TODO # DELETE THIS LATER
         
-        youtube_id = self.__get_youtube_videoId(song_name=res['name'])
-        res['youtubeId'] = youtube_id
+        res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
         return res
 
     def __get_closest_song_by_distances(self, processed_songs, distance_formula, eval_func) -> Tuple:
@@ -56,10 +61,10 @@ class RecommendationSystem:
                 feature_sum = distance_formula(liked_feature, dataset_feature)
                 distances[id] = [distances[id][0] + feature_sum, details[1]]
 
-        min_val = eval_func(distances.items(), key=lambda x: x[1])
+        best_match = eval_func(distances.items(), key=lambda x: x[1])
         return ({
-            "id": min_val[0], 
-            "name": min_val[1][1]
+            "id": best_match[0], 
+            "name": best_match[1][1]
         }, distances)
     
     def __get_youtube_videoId(self, song_name) -> str:
