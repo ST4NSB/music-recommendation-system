@@ -1,3 +1,4 @@
+dataset: data.csv
 distance_algorithm:
     algorithm: Distance.get_cosine_similarity
     eval_func: max

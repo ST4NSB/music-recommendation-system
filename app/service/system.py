@@ -10,23 +10,47 @@ from collections import defaultdict
 
 class RecommendationSystem:
 
-    def __init__(self) -> None:        
-        self.cfg = Utils.get_config_settings()
-        self.__songs_dataset = {
-            'id1': ([9.0, 4.5, 4.0], 'fanfarlo'),
-            'id2': ([7.0, 6.0, 5.0], 'CHVRCHES - Death Stranding (Audio)'),
-            'id9': ([4.0, 5.0, 2.0], 'some stuff'),
-            'id3': ([9.0, 4.0, 5.0], 'Phoebe Bridgers - Full Performance'),
-            'id4': ([1.5, 2.5, 3.5], 'big thief - little things'),
-            'id5': ([3.0, 2.0, 3.0], 'test')
-        }
+    def __init__(self) -> None:
+        self.cfg = Utils.get_yaml_content('config.yml')
+        # self.__songs_dataset = {
+        #     'id1': ([9.0, 4.5, 4.0], 'fanfarlo'),
+        #     'id2': ([7.0, 6.0, 5.0], 'CHVRCHES - Death Stranding (Audio)'),
+        #     'id9': ([4.0, 5.0, 2.0], 'some stuff'),
+        #     'id3': ([9.0, 4.0, 5.0], 'Phoebe Bridgers - Full Performance'),
+        #     'id4': ([1.5, 2.5, 3.5], 'big thief - little things'),
+        #     'id5': ([3.0, 2.0, 3.0], 'test')
+        # }
+
+        self.__songs_dataset = self.__get_processed_dataset()
+        print(self.__songs_dataset)
 
         self.x = self.__get_processed_dataset()
 
     def __get_processed_dataset(self) -> None:
-        with open("data.csv", "r", encoding="utf8") as csvfile:
+        with open(self.cfg['dataset'], "r", encoding="utf8") as csvfile:
             df = pd.read_csv(csvfile)
-        print(df.to_string()) # TODO delete this 
+
+        songs = {}
+        
+        for _, row in df.iterrows():
+            songs[row['id']] = (
+                Utils.get_cleaned_name_dataset(row['artists'], row['name'], row['year']),
+                [
+                    row['acousticness'],
+                    row['danceability'],
+                    row['energy'],
+                    row['instrumentalness'],
+                    row['valence'],
+                    row['tempo'],
+                    row['liveness'],
+                    row['loudness'],
+                    row['speechiness'],
+                    row['mode'],
+                    row['popularity']
+                ]
+            )
+
+        return songs
 
     def get_next_song(self, processed_songs) -> float:
 
@@ -41,25 +65,25 @@ class RecommendationSystem:
         
         print(distances) # TODO # DELETE THIS LATER
         
-        res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
+        #res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
         return res
 
     def __get_closest_song_by_distances(self, processed_songs, distance_formula, eval_func) -> Tuple:
         distances, liked_songs = defaultdict(lambda: [0, '']), []
 
         for song in processed_songs['liked']:
-            liked_songs.append(self.__songs_dataset[song][0])
+            liked_songs.append(self.__songs_dataset[song][1])
 
         for id, details in self.__songs_dataset.items(): 
             if id in processed_songs['skipped']:
                 continue
 
             for liked_song in liked_songs:
-                dataset_feature = Utils.convert_to_numpy_array(details[0])
+                dataset_feature = Utils.convert_to_numpy_array(details[1])
                 liked_feature = Utils.convert_to_numpy_array(liked_song)
 
                 feature_sum = distance_formula(liked_feature, dataset_feature)
-                distances[id] = [distances[id][0] + feature_sum, details[1]]
+                distances[id] = [details[1], distances[id][1] + feature_sum]
 
         best_match = eval_func(distances.items(), key=lambda x: x[1])
         return ({

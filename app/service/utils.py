@@ -1,7 +1,7 @@
 
 from typing import Dict, List
-import numpy
-import yaml
+from functools import reduce
+import numpy, yaml
 
 class Utils:
     @staticmethod
@@ -9,7 +9,12 @@ class Utils:
         return numpy.array(item).astype(numpy.float)
 
     @staticmethod
-    def get_config_settings() -> Dict:
-        with open("config.yml", "r") as ymlfile:
-            cfg = yaml.safe_load(ymlfile)
-        return cfg
+    def get_yaml_content(file) -> Dict:
+        with open(file, "r") as ymlfile:
+            fl = yaml.safe_load(ymlfile)
+        return fl
+
+    @staticmethod
+    def get_cleaned_name_dataset(artists, name, year='') -> str:
+        artists_list = artists.replace('[', '').replace(']', '').replace('\'', '').split(',')
+        return f"{reduce(lambda a, b: a.strip() + ', ' + b.strip(), artists_list)} - {name} ({year})"
