@@ -13,18 +13,15 @@ class RecommendationSystem:
     def __init__(self) -> None:
         self.cfg = Utils.get_yaml_content('config.yml')
         # self.__songs_dataset = {
-        #     'id1': ([9.0, 4.5, 4.0], 'fanfarlo'),
-        #     'id2': ([7.0, 6.0, 5.0], 'CHVRCHES - Death Stranding (Audio)'),
-        #     'id9': ([4.0, 5.0, 2.0], 'some stuff'),
-        #     'id3': ([9.0, 4.0, 5.0], 'Phoebe Bridgers - Full Performance'),
-        #     'id4': ([1.5, 2.5, 3.5], 'big thief - little things'),
-        #     'id5': ([3.0, 2.0, 3.0], 'test')
+        #     'id1': ('CHVRCHES - Death Stranding (Audio)', [7.0, 6.0, 5.0]),
+        #     'id2': ('Phoebe Bridgers - Full Performance', [9.0, 4.0, 5.0]),
+        #     'id3': ('test', [6.0, 5.0, 5.0]),
+        #     'id4': ('f', [6.0, 5.0, 5.0]),
+        #     'id5': ('hello', [7.0, 6.0, 5.0]),
+        #     'id6': ('z', [111.0, 24.0, 5.0]),
         # }
 
         self.__songs_dataset = self.__get_processed_dataset()
-        print(self.__songs_dataset)
-
-        self.x = self.__get_processed_dataset()
 
     def __get_processed_dataset(self) -> None:
         with open(self.cfg['dataset'], "r", encoding="utf8") as csvfile:
@@ -36,17 +33,17 @@ class RecommendationSystem:
             songs[row['id']] = (
                 Utils.get_cleaned_name_dataset(row['artists'], row['name'], row['year']),
                 [
-                    row['acousticness'],
-                    row['danceability'],
-                    row['energy'],
-                    row['instrumentalness'],
-                    row['valence'],
-                    row['tempo'],
-                    row['liveness'],
-                    row['loudness'],
-                    row['speechiness'],
-                    row['mode'],
-                    row['popularity']
+                    row['acousticness'] * self.cfg['weights']['acousticness'],
+                    row['danceability'] * self.cfg['weights']['danceability'],
+                    row['energy'] * self.cfg['weights']['energy'],
+                    row['instrumentalness'] * self.cfg['weights']['instrumentalness'],
+                    row['valence'] * self.cfg['weights']['valence'],
+                    row['tempo'] * self.cfg['weights']['tempo'],
+                    row['liveness'] * self.cfg['weights']['liveness'],
+                    row['loudness'] * self.cfg['weights']['loudness'],
+                    row['speechiness'] * self.cfg['weights']['speechiness'],
+                    row['mode'] * self.cfg['weights']['mode'],
+                    row['popularity'] * self.cfg['weights']['popularity']
                 ]
             )
 
@@ -65,11 +62,11 @@ class RecommendationSystem:
         
         print(distances) # TODO # DELETE THIS LATER
         
-        #res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
+        res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
         return res
 
     def __get_closest_song_by_distances(self, processed_songs, distance_formula, eval_func) -> Tuple:
-        distances, liked_songs = defaultdict(lambda: [0, '']), []
+        distances, liked_songs = defaultdict(lambda: ['', 0]), []
 
         for song in processed_songs['liked']:
             liked_songs.append(self.__songs_dataset[song][1])
@@ -83,12 +80,12 @@ class RecommendationSystem:
                 liked_feature = Utils.convert_to_numpy_array(liked_song)
 
                 feature_sum = distance_formula(liked_feature, dataset_feature)
-                distances[id] = [details[1], distances[id][1] + feature_sum]
+                distances[id] = [details[0], distances[id][1] + feature_sum]
 
-        best_match = eval_func(distances.items(), key=lambda x: x[1])
+        best_match = eval_func(distances.items(), key=lambda x: x[1][1])
         return ({
             "id": best_match[0], 
-            "name": best_match[1][1]
+            "name": best_match[1][0]
         }, distances)
     
     def __get_youtube_videoId(self, song_name) -> str:

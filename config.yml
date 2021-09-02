@@ -1,4 +1,18 @@
 dataset: data.csv
+
+weights:
+    acousticness: 0.1
+    danceability: 0.1
+    energy: 0.1
+    instrumentalness: 0.1
+    valence: 0.1
+    tempo: 0.1
+    liveness: 0.1
+    loudness: 0.1
+    speechiness: 0.1
+    mode: 0.08
+    popularity: 0.02
+
 distance_algorithm:
-    algorithm: Distance.get_cosine_similarity
-    eval_func: max
+    algorithm: Distance.get_euclidean_distance
+    eval_func: min
