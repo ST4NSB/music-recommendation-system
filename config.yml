@@ -3,20 +3,21 @@ clean_log: true
 dataset: data_test.csv
 
 weights:
-    acousticness: 0.135
-    danceability: 0.12
-    energy: 0.12
-    tempo: 0.095
-    instrumentalness: 0.095
-    mode: 0.09
-    speechiness: 0.09
-    loudness: 0.085
+    acousticness: 0.130
+    danceability: 0.105
+    energy: 0.105
+    tempo: 0.09
+    instrumentalness: 0.085
+    mode: 0.085
+    loudness: 0.08
+    speechiness: 0.08
     liveness: 0.08
     valence: 0.075
-    popularity: 0.01
+    year: 0.06
+    popularity: 0.025
 
 distance_algorithm:
-    algorithm: Distance.get_euclidean_distance
-    eval_func: min
+    distmax: Distance.get_cosine_similarity
+    distmin: Distance.get_euclidean_distance
     results_count: 50
     threshold_year: 1965

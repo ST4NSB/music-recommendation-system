@@ -6,6 +6,7 @@ import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
 from collections import defaultdict, namedtuple
+from difflib import SequenceMatcher
 
 class RecommendationSystem:
 
@@ -54,7 +55,8 @@ class RecommendationSystem:
                     self.__compute_feature_value(row['loudness'], norm_data['loudness'], self.cfg['weights']['loudness']),
                     self.__compute_feature_value(row['speechiness'], norm_data['speechiness'], self.cfg['weights']['speechiness']),
                     self.__compute_feature_value(row['mode'], norm_data['mode'], self.cfg['weights']['mode']),
-                    self.__compute_feature_value(row['popularity'], norm_data['popularity'], self.cfg['weights']['popularity'])
+                    self.__compute_feature_value(row['popularity'], norm_data['popularity'], self.cfg['weights']['popularity']),
+                    self.__compute_feature_value(row['year'], norm_data['year'], self.cfg['weights']['year']),
                 ]
             }
 
@@ -74,6 +76,7 @@ class RecommendationSystem:
             'liveness': Minmax(min=min(df['liveness']), max=max(df['liveness'])),
             'valence': Minmax(min=min(df['valence']), max=max(df['valence'])),
             'popularity': Minmax(min=min(df['popularity']), max=max(df['popularity'])),
+            'year': Minmax(min=self.cfg['distance_algorithm']['threshold_year'], max=max(df['year'])),
         }
 
     def __compute_feature_value(self, row, normalized_data_tuple, weight) -> float:
@@ -87,15 +90,15 @@ class RecommendationSystem:
 
         res, distances = self.__get_closest_song_by_distances(
             processed_songs, 
-            distance_formula=eval(self.cfg['distance_algorithm']['algorithm']), 
-            eval_func=eval(self.cfg['distance_algorithm']['eval_func'])
+            distmax=eval(self.cfg['distance_algorithm']['distmax']), 
+            distmin=eval(self.cfg['distance_algorithm']['distmin'])
         )
 
         res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
         self.logger.info(f" * [GetNextSong]Result: {res}, type: {type(res)}")
         return res
 
-    def __get_closest_song_by_distances(self, processed_songs, distance_formula, eval_func) -> Tuple:
+    def __get_closest_song_by_distances(self, processed_songs, distmax, distmin) -> Tuple:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
@@ -109,13 +112,13 @@ class RecommendationSystem:
                 dataset_feature = Utils.convert_to_numpy_array(details['feature_array'])
                 liked_feature = Utils.convert_to_numpy_array(liked_song)
 
-                feature_sum = distance_formula(liked_feature, dataset_feature)
+                feature_sum = distmax(liked_feature, dataset_feature) - distmin(liked_feature, dataset_feature)
                 distances[id] = { 
                     'name': details['name'],
                     'distance_value': distances[id]['distance_value'] + feature_sum 
                 }
 
-        best_match = eval_func(distances.items(), key=lambda x: x[1]['distance_value'])
+        best_match = max(distances.items(), key=lambda x: x[1]['distance_value'])
         self.logger.info(f" * [GetNextSong]Best song match: {best_match}")
         
         return {

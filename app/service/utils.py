@@ -26,4 +26,4 @@ class Utils:
 
     @staticmethod
     def normalize(value, min_value, max_value) -> float:
-        return (value - min_value) / (max_value - min_value) 
+        return (value - min_value) / (max_value - min_value)
