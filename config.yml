@@ -1,4 +1,4 @@
-dataset: data.csv
+dataset: data_test.csv
 
 weights:
     acousticness: 0.1
@@ -10,8 +10,8 @@ weights:
     liveness: 0.1
     loudness: 0.1
     speechiness: 0.1
-    mode: 0.08
-    popularity: 0.02
+    mode: 0.06
+    popularity: 0.04
 
 distance_algorithm:
     algorithm: Distance.get_euclidean_distance
