@@ -99,9 +99,7 @@ class RecommendationSystem:
         url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&key={API_KEY}&type=video&q={song_name}"
         data = requests.get(url).json()
         
-        if 'videoId' not in data:
-            return None
-        if not data['items'][0]['id']['videoId']:
+        if 'items' not in data or not data['items']:
             return None
         
         return data['items'][0]['id']['videoId']
