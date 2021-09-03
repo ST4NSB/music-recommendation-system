@@ -1,5 +1,4 @@
 
-import csv
 from typing import Dict, List, Tuple
 
 import requests, os
@@ -10,27 +9,27 @@ from collections import defaultdict, namedtuple
 
 class RecommendationSystem:
 
-    def __init__(self) -> None:
-        self.cfg = Utils.get_yaml_content('config.yml')
+    def __init__(self, logger, cfg) -> None:
+        self.logger = logger
+        self.cfg = cfg
+
+        # example
         # self.__songs_dataset = {
-        #     'id1': ('CHVRCHES - Death Stranding (Audio)', [7.0, 6.0, 5.0]),
-        #     'id2': ('Phoebe Bridgers - Full Performance', [9.0, 4.0, 5.0]),
-        #     'id3': ('test', [6.0, 5.0, 5.0]),
-        #     'id4': ('f', [6.0, 5.0, 5.0]),
-        #     'id5': ('hello', [7.0, 6.0, 5.0]),
-        #     'id6': ('z', [111.0, 24.0, 5.0]),
+        #     'id1': { 'name': 'CHVRCHES - Death Stranding (Audio)', 'feature_array': [7.0, 6.0, 5.0],},
+        #     'id2': { 'name': 'Phoebe Bridgers - Full Performance', 'feature_array': [9.0, 4.0, 5.0], },
+        #     'id3': { 'name': 'test', 'feature_array': [6.0, 5.0, 5.0] },
+        #     'id4': { 'name': 'f', 'feature_array': [6.0, 5.0, 5.0] },
+        #     'id5': { 'name': 'hello', 'feature_array': [7.0, 6.0, 5.0] },
+        #     'id6': { 'name': 'z', 'feature_array': [111.0, 24.0, 5.0] }
         # }
 
         self.__songs_dataset = self.__get_processed_dataset()
-        print(self.__songs_dataset['6KbQ3uYMLKb5jDxLF7wYDD']['feature_array'])
 
     def __get_processed_dataset(self) -> None:
         with open(self.cfg['dataset'], "r", encoding="utf8") as csvfile:
             df = pd.read_csv(csvfile)
 
-        songs = {}
-        
-        
+        songs = {}        
         for _, row in df.iterrows():
             songs[row['id']] = {
                 'name': Utils.get_cleaned_name_dataset(row['artists'], row['name'], row['year']),
@@ -61,12 +60,13 @@ class RecommendationSystem:
             distance_formula=eval(self.cfg['distance_algorithm']['algorithm']), 
             eval_func=eval(self.cfg['distance_algorithm']['eval_func'])
         )
-        
+
         res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
+        self.logger.info(f" * [GetNextSong]Result: {res}, type: {type(res)}")
         return res
 
     def __get_closest_song_by_distances(self, processed_songs, distance_formula, eval_func) -> Tuple:
-        distances, liked_songs = defaultdict(lambda: {'name': '', 'feature_array': 0}), []
+        distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
             liked_songs.append(self.__songs_dataset[song]['feature_array'])
@@ -82,18 +82,27 @@ class RecommendationSystem:
                 feature_sum = distance_formula(liked_feature, dataset_feature)
                 distances[id] = { 
                     'name': details['name'],
-                    'feature_array': distances[id]['feature_array'] + feature_sum 
+                    'distance_value': distances[id]['distance_value'] + feature_sum 
                 }
 
-        best_match = eval_func(distances.items(), key=lambda x: x[1]['feature_array'])
-        return ({
+        best_match = eval_func(distances.items(), key=lambda x: x[1]['distance_value'])
+        self.logger.info(f" * [GetNextSong]Best song match: {best_match}")
+        
+        return {
             "id": best_match[0], 
             "name": best_match[1]['name']
-        }, dict(distances))
+        }, dict(distances)
     
     def __get_youtube_videoId(self, song_name) -> str:
         API_KEY = os.getenv('API_KEY')
+
         url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&key={API_KEY}&type=video&q={song_name}"
-        
         data = requests.get(url).json()
+        
+        if 'videoId' not in data:
+            return None
+        if not data['items'][0]['id']['videoId']:
+            return None
+        
         return data['items'][0]['id']['videoId']
+

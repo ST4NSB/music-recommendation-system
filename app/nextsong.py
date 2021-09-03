@@ -13,9 +13,10 @@ class NextSong(Resource):
             result = self.rs.get_next_song(request.json)
             response = make_response(jsonify(result), 200)
             response.headers["Content-Type"] = "application/json"
-        except:
-            response = make_response(jsonify(self.err_msg), 500)
-            response.headers["Content-Type"] = "application/json"
-        finally:
             return response
+        except Exception as e:
+            response = make_response(e, 500) # jsonify(self.err_msg)
+            response.headers["Content-Type"] = "application/json"
+            return response
+            
         

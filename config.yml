@@ -1,3 +1,5 @@
+clean_log: true
+
 dataset: data_test.csv
 
 weights:
@@ -16,3 +18,4 @@ weights:
 distance_algorithm:
     algorithm: Distance.get_euclidean_distance
     eval_func: min
+    results_count: 50
