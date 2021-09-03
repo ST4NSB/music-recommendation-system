@@ -37,11 +37,15 @@ class RecommendationSystem:
         norm_data = self.__get_minmax_values(df)
         self.logger.info(f"Min max values for normalization: {norm_data}")
 
-        songs = {}        
+        songs, existing_songs = {}, set()    
         for _, row in df.iterrows():
             if row['year'] < self.cfg['distance_algorithm']['threshold_year']:
                 continue
 
+            if Utils.get_curated_name_dataset(row['artists'], row['name']) in existing_songs:
+                continue
+
+            existing_songs.add(Utils.get_curated_name_dataset(row['artists'], row['name']))
             songs[row['id']] = {
                 'name': Utils.get_curated_name_dataset(row['artists'], row['name'], row['year']),
                 'feature_array': [

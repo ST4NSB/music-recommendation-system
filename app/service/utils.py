@@ -2,7 +2,7 @@
 from collections import namedtuple
 from typing import Dict, List
 from functools import reduce
-import numpy, yaml
+import numpy, yaml, re
 
 class Utils:
     @staticmethod
@@ -18,7 +18,8 @@ class Utils:
     @staticmethod
     def get_curated_name_dataset(artists, name, year='') -> str:
         artists_list = artists.replace('[', '').replace(']', '').replace('\'', '').split(',')
-        return f"{reduce(lambda a, b: a.strip() + ', ' + b.strip(), artists_list)} - {name} ({year})"
+        curated_name = re.sub(r'\([^)]*\)', '', name).rstrip() # remove parantheses & text inside.. e.g. "[SINGLE], [OFFICIAL] etc."
+        return f"{reduce(lambda a, b: a.strip() + ', ' + b.strip(), artists_list)} - {curated_name} ({year})"
     
     @staticmethod
     def clean_log(logger_fn) -> None:

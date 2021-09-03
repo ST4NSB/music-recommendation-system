@@ -1,6 +1,6 @@
 clean_log: true
 
-dataset: data_test.csv
+dataset: data.csv
 
 weights:
     acousticness: 0.130

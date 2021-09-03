@@ -9,18 +9,14 @@ class NextSong(Resource):
         self.err_msg = err_msg
 
     def post(self) -> Response:
-        result = self.rs.get_next_song(request.json)
-        response = make_response(jsonify(result), 200)
-        response.headers["Content-Type"] = "application/json"
-        return response
-        # try:
-        #     result = self.rs.get_next_song(request.json)
-        #     response = make_response(jsonify(result), 200)
-        #     response.headers["Content-Type"] = "application/json"
-        #     return response
-        # except:
-        #     response = make_response(jsonify(self.err_msg), 500)
-        #     response.headers["Content-Type"] = "application/json"
-        #     return response
+        try:
+            result = self.rs.get_next_song(request.json)
+            response = make_response(jsonify(result), 200)
+            response.headers["Content-Type"] = "application/json"
+            return response
+        except:
+            response = make_response(jsonify(self.err_msg), 500)
+            response.headers["Content-Type"] = "application/json"
+            return response
             
         
