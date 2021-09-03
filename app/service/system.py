@@ -24,6 +24,10 @@ class RecommendationSystem:
         # }
 
         self.__songs_dataset = self.__get_processed_dataset()
+        self.logger.info(f" * Number of songs: {len(self.__songs_dataset)}")
+        self.logger.info(
+            f" * First 10 songs from dataset: { list(self.__songs_dataset.items())[0:10] }"
+        )
 
     def __get_processed_dataset(self) -> None:
         with open(self.cfg['dataset'], "r", encoding="utf8") as csvfile:
@@ -31,6 +35,9 @@ class RecommendationSystem:
 
         songs = {}        
         for _, row in df.iterrows():
+            if row['year'] < self.cfg['distance_algorithm']['song_cutoff_year']:
+                continue
+
             songs[row['id']] = {
                 'name': Utils.get_cleaned_name_dataset(row['artists'], row['name'], row['year']),
                 'feature_array': [
@@ -72,7 +79,7 @@ class RecommendationSystem:
             liked_songs.append(self.__songs_dataset[song]['feature_array'])
 
         for id, details in self.__songs_dataset.items(): 
-            if id in processed_songs['skipped']:
+            if id in processed_songs['skipped'] or id in processed_songs['liked']:
                 continue
 
             for liked_song in liked_songs:
