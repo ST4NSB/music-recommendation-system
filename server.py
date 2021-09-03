@@ -16,7 +16,7 @@ api = Api(app)
 logging.basicConfig(filename=logger_fn,level=logging.DEBUG)
 
 rs = RecommendationSystem(logger=app.logger, cfg=cfg)
-basic_error_message = { "error": "Something went wrong with the recommender system."}
+basic_error_message = { "errorMessage": "Something went wrong with the recommender system."}
  
 api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'err_msg': basic_error_message})
 

@@ -1,5 +1,5 @@
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import requests, os
 import pandas as pd
@@ -33,29 +33,52 @@ class RecommendationSystem:
         with open(self.cfg['dataset'], "r", encoding="utf8") as csvfile:
             df = pd.read_csv(csvfile)
 
+        norm_data = self.__get_minmax_values(df)
+        self.logger.info(f"Min max values for normalization: {norm_data}")
+
         songs = {}        
         for _, row in df.iterrows():
-            if row['year'] < self.cfg['distance_algorithm']['song_cutoff_year']:
+            if row['year'] < self.cfg['distance_algorithm']['threshold_year']:
                 continue
 
             songs[row['id']] = {
-                'name': Utils.get_cleaned_name_dataset(row['artists'], row['name'], row['year']),
+                'name': Utils.get_curated_name_dataset(row['artists'], row['name'], row['year']),
                 'feature_array': [
-                    row['acousticness'] * self.cfg['weights']['acousticness'],
-                    row['danceability'] * self.cfg['weights']['danceability'],
-                    row['energy'] * self.cfg['weights']['energy'],
-                    row['instrumentalness'] * self.cfg['weights']['instrumentalness'],
-                    row['valence'] * self.cfg['weights']['valence'],
-                    row['tempo'] * self.cfg['weights']['tempo'],
-                    row['liveness'] * self.cfg['weights']['liveness'],
-                    row['loudness'] * self.cfg['weights']['loudness'],
-                    row['speechiness'] * self.cfg['weights']['speechiness'],
-                    row['mode'] * self.cfg['weights']['mode'],
-                    row['popularity'] * self.cfg['weights']['popularity']
+                    self.__compute_feature_value(row['acousticness'], norm_data['acousticness'], self.cfg['weights']['acousticness']),
+                    self.__compute_feature_value(row['danceability'], norm_data['danceability'], self.cfg['weights']['danceability']),
+                    self.__compute_feature_value(row['energy'], norm_data['energy'], self.cfg['weights']['energy']),
+                    self.__compute_feature_value(row['instrumentalness'], norm_data['instrumentalness'], self.cfg['weights']['instrumentalness']),
+                    self.__compute_feature_value(row['valence'], norm_data['valence'], self.cfg['weights']['valence']),
+                    self.__compute_feature_value(row['tempo'], norm_data['tempo'], self.cfg['weights']['tempo']),
+                    self.__compute_feature_value(row['liveness'], norm_data['liveness'], self.cfg['weights']['liveness']),
+                    self.__compute_feature_value(row['loudness'], norm_data['loudness'], self.cfg['weights']['loudness']),
+                    self.__compute_feature_value(row['speechiness'], norm_data['speechiness'], self.cfg['weights']['speechiness']),
+                    self.__compute_feature_value(row['mode'], norm_data['mode'], self.cfg['weights']['mode']),
+                    self.__compute_feature_value(row['popularity'], norm_data['popularity'], self.cfg['weights']['popularity'])
                 ]
             }
 
         return songs
+
+    def __get_minmax_values(self, df) -> Dict:
+        Minmax = namedtuple('Minmax', ('min, max'))
+        return {
+            'acousticness': Minmax(min=min(df['acousticness']), max=max(df['acousticness'])),
+            'danceability': Minmax(min=min(df['danceability']), max=max(df['danceability'])),
+            'energy': Minmax(min=min(df['energy']), max=max(df['energy'])),
+            'mode': Minmax(min=min(df['mode']), max=max(df['mode'])),
+            'tempo': Minmax(min=min(df['tempo']), max=max(df['tempo'])),
+            'instrumentalness': Minmax(min=min(df['instrumentalness']), max=max(df['instrumentalness'])),
+            'speechiness': Minmax(min=min(df['speechiness']), max=max(df['speechiness'])),
+            'loudness': Minmax(min=min(df['loudness']), max=max(df['loudness'])),
+            'liveness': Minmax(min=min(df['liveness']), max=max(df['liveness'])),
+            'valence': Minmax(min=min(df['valence']), max=max(df['valence'])),
+            'popularity': Minmax(min=min(df['popularity']), max=max(df['popularity'])),
+        }
+
+    def __compute_feature_value(self, row, normalized_data_tuple, weight) -> float:
+        normalized_value = Utils.normalize(row, normalized_data_tuple.min, normalized_data_tuple.max)
+        return normalized_value * weight
 
     def get_next_song(self, processed_songs) -> float:
 
@@ -100,10 +123,10 @@ class RecommendationSystem:
             "name": best_match[1]['name']
         }, dict(distances)
     
-    def __get_youtube_videoId(self, song_name) -> str:
+    def __get_youtube_videoId(self, song_name) -> Optional[str]:
         API_KEY = os.getenv('API_KEY')
 
-        url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&key={API_KEY}&type=video&q={song_name}"
+        url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&regionCode=US&key={API_KEY}&type=video&q={song_name}"
         data = requests.get(url).json()
         
         if 'items' not in data or not data['items']:
