@@ -6,7 +6,9 @@ import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
 from collections import defaultdict, namedtuple
-from difflib import SequenceMatcher
+from lxml import html
+from googlesearch import search
+from bs4 import BeautifulSoup
 
 class RecommendationSystem:
 
@@ -98,7 +100,11 @@ class RecommendationSystem:
             distmin=eval(self.cfg['distance_algorithm']['distmin'])
         )
 
-        res['youtubeId'] = self.__get_youtube_videoId(song_name=res['name'])
+        youtube_id = self.__get_youtube_videoId(song_name=res['name'])
+        if not youtube_id:
+            youtube_id = self.__get_video_from_google(song_name=res['name'])
+
+        res['youtubeId'] = youtube_id
         self.logger.info(f" * [GetNextSong]Result: {res}, type: {type(res)}")
         return res
 
@@ -141,3 +147,20 @@ class RecommendationSystem:
         
         return data['items'][0]['id']['videoId']
 
+    def __get_video_from_google(self, song_name) -> Optional[str]:
+        search_result_list = list(search(query=song_name, tld="com", num=20, stop=3, pause=1))
+        
+        video_url = None
+        for i in range(len(search_result_list)):
+            page = requests.get(search_result_list[i]) 
+            url = str(BeautifulSoup(page.url, features="lxml"))
+            if '<html><body><p>https://www.youtube.com/watch?v=' in url:
+                video_url = url
+                break
+            
+        if not video_url:
+            return None
+
+        video_id = video_url.replace('<html><body><p>https://www.youtube.com/watch?v=', '').replace('</p></body></html>', '')
+        self.logger.info(f" * [GetNextSong]videoId: {video_id}, video url: {video_url}, type: {type(video_url)}")
+        return video_id
