@@ -6,6 +6,7 @@ __pycache__/
 # files
 data.csv
 data_test.csv
+feature_ds.json
 
 # C extensions
 *.so

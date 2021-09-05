@@ -1,8 +1,9 @@
 
-from collections import namedtuple
-from typing import Dict, List
+import numpy, yaml, re, os, json
+from typing import Any, Dict, List, Optional
 from functools import reduce
-import numpy, yaml, re
+import pandas as pd
+from pathlib import Path
 
 class Utils:
     @staticmethod
@@ -28,3 +29,24 @@ class Utils:
     @staticmethod
     def normalize(value, min_value, max_value) -> float:
         return (value - min_value) / (max_value - min_value)
+
+    @staticmethod
+    def read_csv(filename) -> Any:
+        with open(f"{filename}.csv", "r", encoding="utf8") as csvfile:
+            data = pd.read_csv(csvfile)
+        return data
+
+    @staticmethod
+    def save_json(data, path, filename) -> None:
+        json_data = json.dumps(data)
+        with open(os.path.join(path, f"{filename}.json"), 'w') as file:
+            file.write(json_data)
+
+    @staticmethod
+    def read_json(filename) -> Optional[Dict]:
+        if Path(f"{filename}.json").is_file():
+            with open(f"{filename}.json", "r", encoding="utf8") as json_file:
+                data = json.load(json_file)
+            return data
+        
+        return None

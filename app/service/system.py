@@ -1,4 +1,5 @@
 
+from ntpath import realpath
 from typing import Dict, List, Optional, Tuple
 
 import requests, os
@@ -6,25 +7,15 @@ import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
 from collections import defaultdict, namedtuple
-from lxml import html
 from googlesearch import search
 from bs4 import BeautifulSoup
 
 class RecommendationSystem:
 
-    def __init__(self, logger, cfg) -> None:
+    def __init__(self, logger, cfg, rpath) -> None:
         self.logger = logger
         self.cfg = cfg
-
-        # example
-        # self.__songs_dataset = {
-        #     'id1': { 'name': 'CHVRCHES - Death Stranding (Audio)', 'feature_array': [7.0, 6.0, 5.0],},
-        #     'id2': { 'name': 'Phoebe Bridgers - Full Performance', 'feature_array': [9.0, 4.0, 5.0], },
-        #     'id3': { 'name': 'test', 'feature_array': [6.0, 5.0, 5.0] },
-        #     'id4': { 'name': 'f', 'feature_array': [6.0, 5.0, 5.0] },
-        #     'id5': { 'name': 'hello', 'feature_array': [7.0, 6.0, 5.0] },
-        #     'id6': { 'name': 'z', 'feature_array': [111.0, 24.0, 5.0] }
-        # }
+        self.rpath = rpath
 
         self.__songs_dataset = self.__get_processed_dataset()
         self.logger.info(f" * Number of songs: {len(self.__songs_dataset)}")
@@ -32,9 +23,12 @@ class RecommendationSystem:
             f" * First 10 songs from dataset: { list(self.__songs_dataset.items())[0:10] }"
         )
 
-    def __get_processed_dataset(self) -> None:
-        with open(self.cfg['dataset'], "r", encoding="utf8") as csvfile:
-            df = pd.read_csv(csvfile)
+    def __get_processed_dataset(self) -> Dict:
+        feature_json = Utils.read_json(filename=self.cfg['dataset']['curated'])
+        if feature_json:
+            return feature_json
+
+        df = Utils.read_csv(self.cfg['dataset']['original'])
 
         norm_data = self.__get_minmax_values(df)
         self.logger.info(f"Min max values for normalization: {norm_data}")
@@ -66,6 +60,7 @@ class RecommendationSystem:
                 ]
             }
 
+        Utils.save_json(songs, self.rpath, filename=self.cfg['dataset']['curated'])
         return songs
 
     def __get_minmax_values(self, df) -> Dict:

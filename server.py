@@ -15,9 +15,9 @@ app = Flask(__name__)
 api = Api(app)
 logging.basicConfig(filename=logger_fn,level=logging.DEBUG)
 
-rs = RecommendationSystem(logger=app.logger, cfg=cfg)
+rs = RecommendationSystem(logger=app.logger, cfg=cfg, rpath=app.root_path)
 basic_error_message = { "errorMessage": "Something went wrong with the recommender system."}
- 
+
 api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'err_msg': basic_error_message})
 
 if __name__ =="__main__": 
