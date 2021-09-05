@@ -21,5 +21,6 @@ weights:
 distance_algorithm:
     distmax: Distance.get_cosine_similarity
     distmin: Distance.get_euclidean_distance
+    eval_func: CentralTendencies.get_mean
     results_count: 50
     threshold_year: 1965

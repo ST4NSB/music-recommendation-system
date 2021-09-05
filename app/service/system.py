@@ -1,7 +1,5 @@
 
-from ntpath import realpath
 from typing import Dict, List, Optional, Tuple
-
 import requests, os
 import pandas as pd
 from app.service.distance import Distance
@@ -9,6 +7,7 @@ from app.service.utils import Utils
 from collections import defaultdict, namedtuple
 from googlesearch import search
 from bs4 import BeautifulSoup
+from app.service.central_tendency import CentralTendencies
 
 class RecommendationSystem:
 
@@ -92,7 +91,8 @@ class RecommendationSystem:
         res, distances = self.__get_closest_song_by_distances(
             processed_songs, 
             distmax=eval(self.cfg['distance_algorithm']['distmax']), 
-            distmin=eval(self.cfg['distance_algorithm']['distmin'])
+            distmin=eval(self.cfg['distance_algorithm']['distmin']),
+            eval_func=eval(self.cfg['distance_algorithm']['eval_func'])
         )
 
         youtube_id = self.__get_youtube_videoId(song_name=res['name'])
@@ -103,25 +103,27 @@ class RecommendationSystem:
         self.logger.info(f" * [GetNextSong]Result: {res}, type: {type(res)}")
         return res
 
-    def __get_closest_song_by_distances(self, processed_songs, distmax, distmin) -> Tuple:
+    def __get_closest_song_by_distances(self, processed_songs, distmax, distmin, eval_func) -> Tuple:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
             liked_songs.append(self.__songs_dataset[song]['feature_array'])
 
+        middle_feature = eval_func(
+            Utils.convert_to_numpy_array(liked_songs)
+        )
+        self.logger.info(f" * [GetNextSong]Middle feature: {middle_feature}")
+
         for id, details in self.__songs_dataset.items(): 
             if id in processed_songs['skipped'] or id in processed_songs['liked']:
                 continue
 
-            for liked_song in liked_songs:
-                dataset_feature = Utils.convert_to_numpy_array(details['feature_array'])
-                liked_feature = Utils.convert_to_numpy_array(liked_song)
-
-                feature_sum = distmax(liked_feature, dataset_feature) - distmin(liked_feature, dataset_feature)
-                distances[id] = { 
-                    'name': details['name'],
-                    'distance_value': distances[id]['distance_value'] + feature_sum 
-                }
+            dataset_feature = Utils.convert_to_numpy_array(details['feature_array'])
+            feature_dist_sum = distmax(middle_feature, dataset_feature) - distmin(middle_feature, dataset_feature)
+            distances[id] = { 
+                'name': details['name'],
+                'distance_value': feature_dist_sum
+            }
 
         best_match = max(distances.items(), key=lambda x: x[1]['distance_value'])
         self.logger.info(f" * [GetNextSong]Best song match: {best_match}")
