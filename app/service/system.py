@@ -88,7 +88,7 @@ class RecommendationSystem:
         calculated = False
         songs_number = 10
 
-        res, tmp_dist = self.__get_closest_song_by_distances(
+        tmp_dist = self.__get_all_songs_distances(
             processed_songs, 
             distmax=eval(self.cfg['distance_algorithm']['distmax']), 
             distmin=eval(self.cfg['distance_algorithm']['distmin']),
@@ -101,15 +101,16 @@ class RecommendationSystem:
             f" * [GetNextSong]First 10 closest songs calculated by feature distance: { list(distances.items())[0:10] }"
         )
 
-        youtube_id = self.__get_youtube_videoId(song_name=res['name'])
+        result = [{'id': ID, 'name': NAME['name']} for (ID, NAME) in [x for x in sorted_distances.items()][:1]][0] # !!!! lol
+        youtube_id = self.__get_youtube_videoId(song_name=result['name'])
         if not youtube_id:
-            youtube_id = self.__get_video_from_google(song_name=res['name'])
+            youtube_id = self.__get_video_from_google(song_name=result['name'])
 
-        res['youtubeId'] = youtube_id
-        self.logger.info(f" * [GetNextSong]Result: {res}, type: {type(res)}")
-        return res
+        result['youtubeId'] = youtube_id
+        self.logger.info(f" * [GetNextSong]Result: {result}, type: {type(result)}")
+        return result
 
-    def __get_closest_song_by_distances(self, processed_songs, distmax, distmin, eval_func) -> Tuple:
+    def __get_all_songs_distances(self, processed_songs, distmax, distmin, eval_func) -> Tuple:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
@@ -131,13 +132,7 @@ class RecommendationSystem:
                 'distance_value': feature_dist_sum
             }
 
-        best_match = max(distances.items(), key=lambda x: x[1]['distance_value'])
-        self.logger.info(f" * [GetNextSong]Best song match: {best_match}")
-        
-        return {
-            "id": best_match[0], 
-            "name": best_match[1]['name']
-        }, dict(distances)
+        return dict(distances)
     
     def __get_youtube_videoId(self, song_name) -> Optional[str]:
         API_KEY = os.getenv('API_KEY')
