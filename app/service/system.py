@@ -81,7 +81,7 @@ class RecommendationSystem:
 
     def __compute_feature_value(self, row, normalized_data_tuple, weight) -> float:
         normalized_value = Utils.normalize(row, normalized_data_tuple.min, normalized_data_tuple.max)
-        return math.log(normalized_value) +  math.log(weight)
+        return math.log(normalized_value) + math.log(weight)
 
     def get_next_song(self, processed_songs) -> float:
 
@@ -98,7 +98,7 @@ class RecommendationSystem:
         sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
         distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
         self.logger.info(
-            f" * [GetNextSong]First 10 closest songs calculated by feature distance: { list(distances.items())[0:10] }"
+            f" * [GetNextSong]First 150 closest song names calculated by feature distance: { [val['name'] for val in distances.values()] }"
         )
 
         result = [{'id': ID, 'name': NAME['name']} for (ID, NAME) in [x for x in sorted_distances.items()][:1]][0] # !!!! lol
@@ -110,7 +110,7 @@ class RecommendationSystem:
         self.logger.info(f" * [GetNextSong]Result: {result}, type: {type(result)}")
         return result
 
-    def __get_all_songs_distances(self, processed_songs, distmax, distmin, eval_func) -> Tuple:
+    def __get_all_songs_distances(self, processed_songs, distmax, distmin, eval_func) -> Dict:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
