@@ -5,18 +5,18 @@ dataset:
     curated: feature_ds
 
 weights:
-    acousticness: 0.130
-    danceability: 0.105
+    acousticness: 0.115
     energy: 0.105
+    danceability: 0.1
+    instrumentalness: 0.095
     tempo: 0.09
-    instrumentalness: 0.085
     mode: 0.085
-    loudness: 0.08
+    loudness: 0.085
     speechiness: 0.08
     liveness: 0.08
-    valence: 0.075
-    year: 0.06
-    popularity: 0.025
+    valence: 0.08
+    year: 0.05
+    popularity: 0.035
 
 distance_algorithm:
     distmax: Distance.get_cosine_similarity

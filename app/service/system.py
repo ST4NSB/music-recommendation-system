@@ -1,6 +1,6 @@
 
 from typing import Dict, List, Optional, Tuple
-import requests, os
+import requests, os, math
 import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
@@ -81,7 +81,7 @@ class RecommendationSystem:
 
     def __compute_feature_value(self, row, normalized_data_tuple, weight) -> float:
         normalized_value = Utils.normalize(row, normalized_data_tuple.min, normalized_data_tuple.max)
-        return normalized_value * weight
+        return math.log(normalized_value) +  math.log(weight)
 
     def get_next_song(self, processed_songs) -> float:
 
