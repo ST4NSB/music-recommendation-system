@@ -88,11 +88,17 @@ class RecommendationSystem:
         calculated = False
         songs_number = 10
 
-        res, distances = self.__get_closest_song_by_distances(
+        res, tmp_dist = self.__get_closest_song_by_distances(
             processed_songs, 
             distmax=eval(self.cfg['distance_algorithm']['distmax']), 
             distmin=eval(self.cfg['distance_algorithm']['distmin']),
             eval_func=eval(self.cfg['distance_algorithm']['eval_func'])
+        )
+
+        sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
+        distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
+        self.logger.info(
+            f" * [GetNextSong]First 10 closest songs calculated by feature distance: { list(distances.items())[0:10] }"
         )
 
         youtube_id = self.__get_youtube_videoId(song_name=res['name'])
@@ -112,7 +118,7 @@ class RecommendationSystem:
         middle_feature = eval_func(
             Utils.convert_to_numpy_array(liked_songs)
         )
-        self.logger.info(f" * [GetNextSong]Middle feature: {middle_feature}")
+        self.logger.info(f" * [GetNextSong]Avg. feature values: {middle_feature}")
 
         for id, details in self.__songs_dataset.items(): 
             if id in processed_songs['skipped'] or id in processed_songs['liked']:
