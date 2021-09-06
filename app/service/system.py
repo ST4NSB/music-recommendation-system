@@ -1,6 +1,6 @@
 
 from typing import Dict, List, Optional, Tuple
-import requests, os, math
+import requests, random
 import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
@@ -86,7 +86,20 @@ class RecommendationSystem:
         normalized_value = Utils.normalize(row, normalized_data_tuple.min, normalized_data_tuple.max)
         return normalized_value * weight
 
-    def get_next_song(self, processed_songs) -> float:
+    def get_random_songs(self, processed_songs: Dict) -> List[Dict]:
+        res = []
+        while len(res) < self.cfg['distance_algorithm']['query_songs_limit']:
+            song_id = random.choice(list(self.__songs_dataset.keys()))
+            if song_id in processed_songs['liked'] or song_id in processed_songs['skipped']:
+                continue
+            res.append({
+                "id": song_id,
+                "name": self.__songs_dataset[song_id]['name'],
+                "youtubeId": self.__get_videoId(self.__songs_dataset[song_id]['name'])
+            })
+        return res
+
+    def get_next_song(self, processed_songs: Dict) -> Dict:
         song_threshold = self.cfg['distance_algorithm']['minimmum_songs']
         if len(processed_songs['liked']) < song_threshold:
             raise Exception(f"There are not enough liked songs in the api request, min: {song_threshold} liked songs!~400")
@@ -172,7 +185,8 @@ class RecommendationSystem:
 
         return dict(distances)
 
-    def __get_videoId(self, song_name):
+    def __get_videoId(self, name):
+        song_name = f"{name} Official video"
         youtube_id = self.__get_videoId_from_api(song_name)
         if not youtube_id:
             youtube_id = self.__get_videoId_from_google(song_name)
