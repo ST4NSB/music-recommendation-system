@@ -11,10 +11,12 @@ from app.service.central_tendency import CentralTendencies
 
 class RecommendationSystem:
 
-    def __init__(self, logger, cfg, rpath) -> None:
+    def __init__(self, logger, db, cfg, rpath, yt_api_key) -> None:
         self.logger = logger
+        self.db = db
         self.cfg = cfg
         self.rpath = rpath
+        self.yt_api_key = yt_api_key
 
         self.__songs_dataset = self.__get_processed_dataset()
         self.logger.info(f" * Number of songs: {len(self.__songs_dataset)}")
@@ -99,8 +101,18 @@ class RecommendationSystem:
         sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
         distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
         self.logger.info(
-            f" * [GetNextSong]First 150 closest song names calculated by feature distance: { [val['name'] for val in distances.values()] }"
+            f" * [GetNextSong]First {len(distances)} closest songs calculated by feature distance: { [val['name'] for val in distances.values()] }"
         )
+
+        user_id = processed_songs['userId']
+        if self.db.user_has_songs(user_id):
+            self.db.update_user_songs(user_id, distances)
+        else:
+            user_dist = {
+                'user_id': user_id,
+                'songs': distances
+            }
+            self.db.insert_user_songs(user_dist)
 
         result = [{'id': ID, 'name': NAME['name']} for (ID, NAME) in [x for x in sorted_distances.items()][:1]][0] # !!!! lol
         youtube_id = self.__get_youtube_videoId(song_name=result['name'])
@@ -136,9 +148,7 @@ class RecommendationSystem:
         return dict(distances)
     
     def __get_youtube_videoId(self, song_name) -> Optional[str]:
-        API_KEY = os.getenv('API_KEY')
-
-        url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&regionCode=US&key={API_KEY}&type=video&q={song_name}"
+        url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&regionCode=US&key={self.yt_api_key}&type=video&q={song_name}"
         data = requests.get(url).json()
         
         if 'items' not in data or not data['items']:
