@@ -17,8 +17,12 @@ class Utils:
         return fl
 
     @staticmethod
+    def split_artists(artists: str) -> List[str]:
+        return artists.replace('[', '').replace(']', '').replace('\'', '').split(',')
+
+    @staticmethod
     def get_curated_name_dataset(artists: str, name: str, year: str='') -> str:
-        artists_list = artists.replace('[', '').replace(']', '').replace('\'', '').split(',')
+        artists_list = Utils.split_artists(artists)
         curated_name = re.sub(r'\([^)]*\)', '', name).rstrip() # remove parantheses & text inside.. e.g. "[SINGLE], [OFFICIAL] etc."
         return f"{reduce(lambda a, b: a.strip() + ', ' + b.strip(), artists_list)} - {curated_name} ({year})"
     

@@ -43,6 +43,7 @@ class RecommendationSystem:
             existing_songs.add(Utils.get_curated_name_dataset(row['artists'], row['name']))
             songs[row['id']] = {
                 'name': Utils.get_curated_name_dataset(row['artists'], row['name'], row['year']),
+                'artists': Utils.split_artists(row['artists']),
                 'feature_array': [
                     self.__compute_feature_value(row['acousticness'], norm_data['acousticness'], self.cfg['weights']['acousticness']),
                     self.__compute_feature_value(row['danceability'], norm_data['danceability'], self.cfg['weights']['danceability']),
@@ -81,7 +82,7 @@ class RecommendationSystem:
 
     def __compute_feature_value(self, row, normalized_data_tuple, weight) -> float:
         normalized_value = Utils.normalize(row, normalized_data_tuple.min, normalized_data_tuple.max)
-        return math.log(normalized_value) + math.log(weight)
+        return normalized_value * weight
 
     def get_next_song(self, processed_songs) -> float:
 
