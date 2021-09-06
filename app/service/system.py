@@ -87,9 +87,17 @@ class RecommendationSystem:
         return normalized_value * weight
 
     def get_next_song(self, processed_songs) -> float:
+        song_threshold = self.cfg['distance_algorithm']['minimmum_songs']
+        if len(processed_songs['liked']) < song_threshold:
+            raise Exception(f"There are not enough liked songs in the api request, min: {song_threshold} liked songs!~400")
 
-        calculated = False
-        songs_number = 10
+        user_id = processed_songs['userId']
+        if self.db.user_has_songs(user_id):
+            next_song = self.__get_song_from_db(processed_songs, user_id)
+            if next_song: 
+                next_song['youtubeId'] = self.__get_videoId(next_song['name'])
+                self.logger.info(f" * [GetNextSong]Next Song: {next_song}, type: {type(next_song)}")
+                return next_song
 
         tmp_dist = self.__get_all_songs_distances(
             processed_songs, 
@@ -98,30 +106,47 @@ class RecommendationSystem:
             eval_func=eval(self.cfg['distance_algorithm']['eval_func'])
         )
 
+        if len(tmp_dist) == 0:
+            raise Exception("There are no more songs to recommend! Congrats, it's statistically impossible to get here!~500")
+
         sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
         distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
         self.logger.info(
             f" * [GetNextSong]First {len(distances)} closest songs calculated by feature distance: { [val['name'] for val in distances.values()] }"
         )
-
-        user_id = processed_songs['userId']
+        
         if self.db.user_has_songs(user_id):
             self.db.update_user_songs(user_id, distances)
+            self.logger.info(" * [GetNextSong]Inserted new distances in db")
         else:
             user_dist = {
                 'user_id': user_id,
                 'songs': distances
             }
             self.db.insert_user_songs(user_dist)
+            self.logger.info(" * [GetNextSong]Updated new distances in db")
 
         result = [{'id': ID, 'name': NAME['name']} for (ID, NAME) in [x for x in sorted_distances.items()][:1]][0] # !!!! lol
-        youtube_id = self.__get_youtube_videoId(song_name=result['name'])
-        if not youtube_id:
-            youtube_id = self.__get_video_from_google(song_name=result['name'])
-
-        result['youtubeId'] = youtube_id
+        result['youtubeId'] = self.__get_videoId(result['name'])
         self.logger.info(f" * [GetNextSong]Result: {result}, type: {type(result)}")
         return result
+
+    def __get_song_from_db(self, processed_songs, user_id) -> Optional[Dict]:
+        calculated_distances = self.db.get_user_songs(user_id)
+        self.logger.info(f" * [GetNextSong]Distances from db: {calculated_distances}")
+        
+        next_song = None
+        for key in calculated_distances:
+            if key in processed_songs['liked'] or key in processed_songs['skipped']:
+                continue
+            else:
+                next_song = {
+                    'id': key, 
+                    'name': calculated_distances[key]['name']
+                }
+                break
+        
+        return next_song
 
     def __get_all_songs_distances(self, processed_songs, distmax, distmin, eval_func) -> Dict:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
@@ -146,8 +171,14 @@ class RecommendationSystem:
             }
 
         return dict(distances)
+
+    def __get_videoId(self, song_name):
+        youtube_id = self.__get_videoId_from_api(song_name)
+        if not youtube_id:
+            youtube_id = self.__get_videoId_from_google(song_name)
+        return youtube_id
     
-    def __get_youtube_videoId(self, song_name) -> Optional[str]:
+    def __get_videoId_from_api(self, song_name) -> Optional[str]:
         url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&regionCode=US&key={self.yt_api_key}&type=video&q={song_name}"
         data = requests.get(url).json()
         
@@ -156,7 +187,7 @@ class RecommendationSystem:
         
         return data['items'][0]['id']['videoId']
 
-    def __get_video_from_google(self, song_name) -> Optional[str]:
+    def __get_videoId_from_google(self, song_name) -> Optional[str]:
         search_result_list = list(search(query=song_name, tld="com", num=20, stop=3, pause=1))
         
         video_url = None

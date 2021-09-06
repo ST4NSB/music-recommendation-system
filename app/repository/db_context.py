@@ -21,3 +21,6 @@ class DBContext:
         user_recs = self.db['user_recommended_songs']
         user_recs.update_one({"user_id": user_id}, { "$set": {"songs": songs} }, upsert=True)
         
+    def get_user_songs(self, user_id):
+        user_recs = self.db['user_recommended_songs']
+        return dict(user_recs.find_one({"user_id": user_id})['songs'])
