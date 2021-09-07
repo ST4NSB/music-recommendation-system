@@ -1,7 +1,8 @@
 from typing import Any, Dict
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, abort
 from flask.helpers import make_response
 from flask_restful import Resource
+from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response
 
 class GetArtistSongs(Resource):
@@ -13,20 +14,16 @@ class GetArtistSongs(Resource):
         try:
             key = request.headers.get('API-Key')
             if key != self.api_key:
-                raise Exception("Wrong API-KEY for your request~401")
+                abort(401, 'Wrong API-KEY for your request!')
                 
             result = self.rs.get_artist_songs(name)
             response = make_response(jsonify(result), 200)
             response.headers["Content-Type"] = "application/json"
             return response
         except Exception as e:
-            err = str(e).split('~')    
-            error = { "errorMessage": f"Something went wrong with the system! (Details: {err[0]})" }
-            code = 400
-            if len(err) > 1:
-                code = err[1]
-            response = make_response(jsonify(error), code)
-            response.headers["Content-Type"] = "application/json"
-            return response
+            if isinstance(e, HTTPException):
+                abort(e.code, e.description)
+            else:
+                abort(500, f"Something went wrong with the system! ({e})")
           
         

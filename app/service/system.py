@@ -1,5 +1,6 @@
 
 from typing import Dict, List, Optional, Tuple
+from flask import abort
 import requests, random
 import pandas as pd
 from app.service.distance import Distance
@@ -109,13 +110,13 @@ class RecommendationSystem:
 
         self.logger.info(f" * [GetArtistSongs]Songs by {name}: {res}")
         if len(res) == 0:
-            raise Exception(f"Couldn't find any songs for {name}~404")
+            abort(404, f"Couldn't find any songs for {name}")
         return res
 
     def get_next_song(self, processed_songs: Dict) -> Dict:
         song_threshold = self.cfg['distance_algorithm']['minimmum_songs']
         if len(processed_songs['liked']) < song_threshold:
-            raise Exception(f"There are not enough liked songs in the api request, min: {song_threshold} liked songs!~400")
+            abort(400, f"There are not enough liked songs in the api request, min: {song_threshold} liked songs!")
 
         user_id = processed_songs['userId']
         if self.db.user_has_songs(user_id):
@@ -133,7 +134,7 @@ class RecommendationSystem:
         )
 
         if len(tmp_dist) == 0:
-            raise Exception("There are no more songs to recommend! Congrats, it's statistically impossible to get here!~500")
+            abort(500, "There are no more songs to recommend! Congrats, it's statistically impossible to get here!")
 
         sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
         distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
