@@ -174,8 +174,10 @@ class RecommendationSystem:
             body={
                 "size": self.cfg['distance_algorithm']['query_songs_limit'],
                 "query": {
-                    "match": {
-                        "name": search_query
+                    "combined_fields": {
+                        "query": search_query,
+                        "fields": [ "name", "artists"],
+                        "operator": "or"
                     }
                 }
             }
