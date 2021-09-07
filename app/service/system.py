@@ -9,10 +9,11 @@ from collections import defaultdict, namedtuple
 from googlesearch import search
 from bs4 import BeautifulSoup
 from app.service.central_tendency import CentralTendencies
+from elasticsearch import Elasticsearch
 
 class RecommendationSystem:
 
-    def __init__(self, logger, db, cfg, rpath, yt_api_key) -> None:
+    def __init__(self, logger, db, cfg, rpath, yt_api_key, es_host) -> None:
         self.logger = logger
         self.db = db
         self.cfg = cfg
@@ -20,10 +21,53 @@ class RecommendationSystem:
         self.yt_api_key = yt_api_key
 
         self.__songs_dataset = self.__get_processed_dataset()
+        self.es = Elasticsearch(es_host)
+        self.__configure_elasticsearch()
+        
         self.logger.info(f" * Number of songs: {len(self.__songs_dataset)}")
         self.logger.info(
             f" * First 10 songs from dataset: { list(self.__songs_dataset.items())[0:10] }"
         )
+
+    def __configure_elasticsearch(self, delete_docs:bool=False) -> None:
+        if not self.es.indices.exists(index="music"):
+            self.es.indices.create(index='music')
+        
+        if delete_docs:
+            self.es.delete_by_query(
+                index="music",
+                doc_type="songs",
+                body={
+                    "query": {
+                        "match_all" : {}
+                    }
+                }
+            )
+
+        items = self.es.search(
+            index="music",
+            doc_type="songs",
+            body={
+                "query": {
+                    "match_all" : {}
+                },
+                "size": 0
+            }
+        )
+
+        if items['hits']['total']['value'] == 0:
+            body = []
+            for key, value in self.__songs_dataset.items():
+                body.append({'index': {'_id': key}})
+                info_body = {
+                    'name': value['name'],
+                    'artists': value['artists']
+                }
+                body.append(info_body)
+            self.es.bulk(index='music', doc_type='songs', body=body)
+
+        self.logger.info(f" * Loaded items in Elastic Search")
+ 
 
     def __get_processed_dataset(self) -> Dict:
         feature_json = Utils.read_json(filename=self.cfg['dataset']['curated'])
@@ -88,70 +132,61 @@ class RecommendationSystem:
         return normalized_value * weight
 
     def get_random_songs(self, processed_songs: Dict) -> List[Dict]:
-        res = []
-        while len(res) < self.cfg['distance_algorithm']['query_songs_limit']:
-            song_id = random.choice(list(self.__songs_dataset.keys()))
-            if song_id in processed_songs['liked'] or song_id in processed_songs['skipped']:
-                continue
-            res.append({
-                "id": song_id,
-                "name": self.__songs_dataset[song_id]['name'],
-                "youtubeId": self.__get_videoId(self.__songs_dataset[song_id]['name'])
+        search_res = self.es.search(
+            index="music",
+            doc_type="songs",
+            body={
+                "query": {
+                    "function_score": {
+                        "functions": [
+                            {
+                                "random_score": {
+                                    "seed": random.randint(0, 999999999)
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        )
+
+        results = []
+        for sr in search_res['hits']['hits']:
+            if len(results) >= self.cfg['distance_algorithm']['query_songs_limit']:
+                break
+
+            results.append({
+                "id": sr['_id'],
+                "name": sr['_source']['name'],
+                "youtubeId": self.__get_videoId(sr['_source']['name'])
             })
-        return res
+        return results
 
     def get_song_names(self, search_query: str) -> List[Dict]:
-        res = []
-        for key, value in self.__songs_dataset.items():
-            if re.search(search_query, value['name'], re.IGNORECASE):
-                res.append({
-                    "id": key,
-                    "name": value['name'],
-                    "youtubeId": self.__get_videoId(value['name'])
-                })
-                if len(res) >= self.cfg['distance_algorithm']['query_songs_limit']:
-                    break
-        
-        self.logger.info(f" * [GetSongs]Songs: {res}")
-        if len(res) == 0:
-            abort(404, f"Couldn't find any songs for '{search_query}'")
-        return res
-    
-    def get_artists_name(self, search_query: str) -> List[Dict]:
-        res = {}
-        sq = search_query.strip()
-        for _, value in self.__songs_dataset.items():
-            if len(res) >= self.cfg['distance_algorithm']['query_artists_limit']:
-                break
-            for artist in value['artists']:
-                artist_stripped = artist.strip()
-                if re.search(sq, artist_stripped, re.IGNORECASE) and sq not in res:
-                    res[artist_stripped] = {
-                        "name": artist_stripped,
-                        "image": self.__get_artist_image(artist_stripped)
+        search_res = self.es.search(
+            index="music",
+            doc_type="songs",
+            body={
+                "size": self.cfg['distance_algorithm']['query_songs_limit'],
+                "query": {
+                    "match": {
+                        "name": search_query
                     }
-        
-        self.logger.info(f" * [GetArtists]Artists: {res}")
-        if len(res) == 0:
-            abort(404, f"Couldn't find any artists for '{search_query}'")
-        return list(res.values())
+                }
+            }
+        )
 
-    def get_artist_songs(self, name: str) -> List[Dict]:
-        res = []
-        for key, value in self.__songs_dataset.items():
-            if name in value['artists']:
-                res.append({
-                    "id": key,
-                    "name": value['name'],
-                    "youtubeId": self.__get_videoId(value['name'])
-                })
-                if len(res) >= self.cfg['distance_algorithm']['query_songs_limit']:
-                    break
+        if len(search_res) == 0:
+            abort(404, f"Couldn't find any songs for '{search_query}'")
 
-        self.logger.info(f" * [GetArtistSongs]Songs by {name}: {res}")
-        if len(res) == 0:
-            abort(404, f"Couldn't find any songs for {name}")
-        return res
+        results = []
+        for sr in search_res['hits']['hits']:
+            results.append({
+                "id": sr['_id'],
+                "name": sr['_source']['name'],
+                "youtubeId": self.__get_videoId(sr['_source']['name'])
+            })
+        return results
 
     def get_next_song(self, processed_songs: Dict) -> Dict:
         song_threshold = self.cfg['distance_algorithm']['minimmum_songs']
@@ -272,19 +307,3 @@ class RecommendationSystem:
         video_id = video_url.replace('<html><body><p>https://www.youtube.com/watch?v=', '').replace('</p></body></html>', '')
         self.logger.info(f" * [GetNextSong]videoId: {video_id}, video url: {video_url}, type: {type(video_url)}")
         return video_id
-
-    def __get_artist_image(self, artist_name):
-        url = f"https://www.theaudiodb.com/api/v1/json/1/search.php?s={artist_name}"
-        data = requests.get(url).json()
-        
-        if 'artists' not in data or not data['artists']:
-            return None
-
-        index = 0
-        for i, res in enumerate(data['artists']):
-            if artist_name == res['strArtist']:
-                index = i
-                break
-        
-        self.logger.info(f" * [GetArtistImage]artist_name: {artist_name}, artist_photo: {data['artists'][index]['strArtistThumb']}")
-        return data['artists'][index]['strArtistThumb']
