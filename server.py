@@ -1,3 +1,5 @@
+from app.getartists import GetArtists
+from app.getsongs import GetSongs
 from app.getartistsongs import GetArtistSongs
 import os, logging
 from app.repository.db_context import DBContext
@@ -25,8 +27,8 @@ rs = RecommendationSystem(logger=app.logger, db=mongo_db, cfg=cfg, rpath=app.roo
 api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 api.add_resource(RandomSongs, '/api/recommender/randomsongs', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 api.add_resource(GetArtistSongs, '/api/recommender/getartistsongs/<name>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
-#api.add_resource(SearchSongs, '/api/recommender/search/<smth>', resource_class_kwargs={'rs': rs})
-#api.add_resource(SearchArtists, '/api/recommender/search/<smth>', resource_class_kwargs={'rs': rs})
+api.add_resource(GetSongs, '/api/recommender/getsongs/<name>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
+api.add_resource(GetArtists, '/api/recommender/getartists/<name>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 
 if __name__ =="__main__": 
     app.run(debug = True)

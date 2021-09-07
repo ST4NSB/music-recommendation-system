@@ -1,7 +1,7 @@
 
 from typing import Dict, List, Optional, Tuple
 from flask import abort
-import requests, random
+import requests, random, re
 import pandas as pd
 from app.service.distance import Distance
 from app.service.utils import Utils
@@ -100,12 +100,52 @@ class RecommendationSystem:
             })
         return res
 
-    def get_artist_songs(self, name: str) -> List[str]:
+    def get_song_names(self, search_query: str) -> List[Dict]:
+        res = []
+        for key, value in self.__songs_dataset.items():
+            if re.search(search_query, value['name'], re.IGNORECASE):
+                res.append({
+                    "id": key,
+                    "name": value['name'],
+                    "youtubeId": self.__get_videoId(value['name'])
+                })
+                if len(res) >= self.cfg['distance_algorithm']['query_songs_limit']:
+                    break
+        
+        self.logger.info(f" * [GetSongs]Songs: {res}")
+        if len(res) == 0:
+            abort(404, f"Couldn't find any songs for '{search_query}'")
+        return res
+    
+    def get_artists_name(self, search_query: str) -> List[Dict]:
+        res = {}
+        sq = search_query.strip()
+        for _, value in self.__songs_dataset.items():
+            if len(res) >= self.cfg['distance_algorithm']['query_artists_limit']:
+                break
+            for artist in value['artists']:
+                artist_stripped = artist.strip()
+                if re.search(sq, artist_stripped, re.IGNORECASE) and sq not in res:
+                    res[artist_stripped] = {
+                        "name": artist_stripped,
+                        "image": self.__get_artist_image(artist_stripped)
+                    }
+        
+        self.logger.info(f" * [GetArtists]Artists: {res}")
+        if len(res) == 0:
+            abort(404, f"Couldn't find any artists for '{search_query}'")
+        return list(res.values())
+
+    def get_artist_songs(self, name: str) -> List[Dict]:
         res = []
         for key, value in self.__songs_dataset.items():
             if name in value['artists']:
-                res.append(key)
-                if len(res) >= self.cfg['distance_algorithm']['minimmum_songs']:
+                res.append({
+                    "id": key,
+                    "name": value['name'],
+                    "youtubeId": self.__get_videoId(value['name'])
+                })
+                if len(res) >= self.cfg['distance_algorithm']['query_songs_limit']:
                     break
 
         self.logger.info(f" * [GetArtistSongs]Songs by {name}: {res}")
@@ -232,3 +272,19 @@ class RecommendationSystem:
         video_id = video_url.replace('<html><body><p>https://www.youtube.com/watch?v=', '').replace('</p></body></html>', '')
         self.logger.info(f" * [GetNextSong]videoId: {video_id}, video url: {video_url}, type: {type(video_url)}")
         return video_id
+
+    def __get_artist_image(self, artist_name):
+        url = f"https://www.theaudiodb.com/api/v1/json/1/search.php?s={artist_name}"
+        data = requests.get(url).json()
+        
+        if 'artists' not in data or not data['artists']:
+            return None
+
+        index = 0
+        for i, res in enumerate(data['artists']):
+            if artist_name == res['strArtist']:
+                index = i
+                break
+        
+        self.logger.info(f" * [GetArtistImage]artist_name: {artist_name}, artist_photo: {data['artists'][index]['strArtistThumb']}")
+        return data['artists'][index]['strArtistThumb']
