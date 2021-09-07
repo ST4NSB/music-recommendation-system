@@ -162,8 +162,8 @@ class RecommendationSystem:
 
             results.append({
                 "id": sr['_id'],
-                "name": sr['_source']['name']
-                #"youtubeId": self.__get_videoId(sr['_source']['name'])
+                "name": sr['_source']['name'],
+                "youtubeId": self.__get_videoId(sr['_source']['name'])
             })
         return results
 
@@ -199,7 +199,7 @@ class RecommendationSystem:
             abort(400, f"There are not enough liked songs in the api request, min: {song_threshold} liked songs!")
 
         user_id = processed_songs['userId']
-        if self.db.user_has_songs(user_id):
+        if self.db.user_has_songs(user_id) and self.db.get_liked_nr_songs(user_id) == len(processed_songs['liked']):
             next_song = self.__get_song_from_db(processed_songs, user_id)
             if next_song: 
                 next_song['youtubeId'] = self.__get_videoId(next_song['name'])
@@ -217,17 +217,18 @@ class RecommendationSystem:
             abort(500, "There are no more songs to recommend! Congrats, it's statistically impossible to get here!")
 
         sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
-        distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:processed_songs['liked']]}
+        distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
         self.logger.info(
             f" * [GetNextSong]First {len(distances)} closest songs calculated by feature distance: { [val['name'] for val in distances.values()] }"
         )
         
         if self.db.user_has_songs(user_id):
-            self.db.update_user_songs(user_id, distances)
+            self.db.update_user_songs(user_id, distances, len(processed_songs['liked']))
             self.logger.info(" * [GetNextSong]Inserted new distances in db")
         else:
             user_dist = {
                 'user_id': user_id,
+                'liked_songs': len(processed_songs['liked']),
                 'songs': distances
             }
             self.db.insert_user_songs(user_dist)

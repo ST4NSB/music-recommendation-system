@@ -16,10 +16,14 @@ class DBContext:
         user_recs = self.db['user_recommended_songs']
         user_recs.insert_one(songs)
 
-    def update_user_songs(self, user_id, songs):
+    def update_user_songs(self, user_id, songs, liked_songs):
         user_recs = self.db['user_recommended_songs']
-        user_recs.update_one({"user_id": user_id}, { "$set": {"songs": songs} }, upsert=True)
+        user_recs.update_one({"user_id": user_id}, { "$set": {"songs": songs, "liked_songs": liked_songs} }, upsert=True)
         
     def get_user_songs(self, user_id):
         user_recs = self.db['user_recommended_songs']
-        return dict(user_recs.find_one({"user_id": user_id})['songs'])
+        return dict(user_recs.find_one({"user_id": user_id}, {"_id": 0, 'user_id': 0, 'liked_songs': 0})['songs'])
+
+    def get_liked_nr_songs(self, user_id: str) -> int:
+        user_recs = self.db['user_recommended_songs']
+        return int(user_recs.find_one({'user_id': user_id}, {"_id": 0, 'user_id': 0, 'songs': 0})['liked_songs'])

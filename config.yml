@@ -24,4 +24,5 @@ distance_algorithm:
     eval_func: CentralTendencies.get_mean
     minimmum_songs: 3
     query_songs_limit: 6
+    results_count: 20
     threshold_year: 1965
