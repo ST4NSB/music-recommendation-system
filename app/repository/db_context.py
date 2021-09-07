@@ -1,10 +1,9 @@
-import os
-import pymongo
+from pymongo import MongoClient
 
 class DBContext:
     def __init__(self, name, passw, cluster):
         connection_string = f"mongodb+srv://{name}:{passw}@{cluster}.qxsgc.mongodb.net/music_recommender?retryWrites=true&w=majority"
-        client = pymongo.MongoClient(connection_string)
+        client = MongoClient(connection_string)
         self.db = client['music_recommender']
 
     def user_has_songs(self, user_id):

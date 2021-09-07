@@ -1,3 +1,4 @@
+from app.getartistsongs import GetArtistSongs
 import os, logging
 from app.repository.db_context import DBContext
 from flask import Flask  
@@ -21,9 +22,11 @@ logging.basicConfig(filename=logger_fn,level=logging.DEBUG)
 mongo_db = DBContext(env.DB_USER_NAME, env.DB_USER_PASS, env.DB_CLUSTER)
 rs = RecommendationSystem(logger=app.logger, db=mongo_db, cfg=cfg, rpath=app.root_path, yt_api_key = env.YT_API_KEY)
 
-api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs})
-api.add_resource(RandomSongs, '/api/recommender/randomsongs', resource_class_kwargs={'rs': rs})
+api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
+api.add_resource(RandomSongs, '/api/recommender/randomsongs', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
+api.add_resource(GetArtistSongs, '/api/recommender/getartistsongs/<name>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 #api.add_resource(SearchSongs, '/api/recommender/search/<smth>', resource_class_kwargs={'rs': rs})
+#api.add_resource(SearchArtists, '/api/recommender/search/<smth>', resource_class_kwargs={'rs': rs})
 
 if __name__ =="__main__": 
     app.run(debug = True)

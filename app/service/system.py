@@ -99,6 +99,19 @@ class RecommendationSystem:
             })
         return res
 
+    def get_artist_songs(self, name: str) -> List[str]:
+        res = []
+        for key, value in self.__songs_dataset.items():
+            if name in value['artists']:
+                res.append(key)
+                if len(res) >= self.cfg['distance_algorithm']['minimmum_songs']:
+                    break
+
+        self.logger.info(f" * [GetArtistSongs]Songs by {name}: {res}")
+        if len(res) == 0:
+            raise Exception(f"Couldn't find any songs for {name}~404")
+        return res
+
     def get_next_song(self, processed_songs: Dict) -> Dict:
         song_threshold = self.cfg['distance_algorithm']['minimmum_songs']
         if len(processed_songs['liked']) < song_threshold:

@@ -4,18 +4,18 @@ from flask.helpers import make_response
 from flask_restful import Resource
 from werkzeug.wrappers import Response
 
-class NextSong(Resource):
+class GetArtistSongs(Resource):
     def __init__(self, rs: Any, api_key: str):
         self.rs = rs
         self.api_key = api_key
 
-    def post(self) -> Response:
+    def get(self, name) -> Response:
         try:
             key = request.headers.get('API-Key')
             if key != self.api_key:
                 raise Exception("Wrong API-KEY for your request~401")
                 
-            result = self.rs.get_next_song(request.json)
+            result = self.rs.get_artist_songs(name)
             response = make_response(jsonify(result), 200)
             response.headers["Content-Type"] = "application/json"
             return response
