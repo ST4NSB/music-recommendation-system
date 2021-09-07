@@ -146,7 +146,8 @@ class RecommendationSystem:
                             }
                         ]
                     }
-                }
+                },
+                "size": 300
             }
         )
 
@@ -155,10 +156,14 @@ class RecommendationSystem:
             if len(results) >= self.cfg['distance_algorithm']['query_songs_limit']:
                 break
 
+            if Utils.get_year_from_name(sr['_source']['name']) < 2015:
+                if random.uniform(0, 1) < 0.8:
+                    continue
+
             results.append({
                 "id": sr['_id'],
-                "name": sr['_source']['name'],
-                "youtubeId": self.__get_videoId(sr['_source']['name'])
+                "name": sr['_source']['name']
+                #"youtubeId": self.__get_videoId(sr['_source']['name'])
             })
         return results
 
@@ -212,7 +217,7 @@ class RecommendationSystem:
             abort(500, "There are no more songs to recommend! Congrats, it's statistically impossible to get here!")
 
         sorted_distances = dict(sorted(tmp_dist.items(), key=lambda item: item[1]['distance_value'], reverse=True))
-        distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:self.cfg['distance_algorithm']['results_count']]}
+        distances = {A:N for (A,N) in [x for x in sorted_distances.items()][:processed_songs['liked']]}
         self.logger.info(
             f" * [GetNextSong]First {len(distances)} closest songs calculated by feature distance: { [val['name'] for val in distances.values()] }"
         )

@@ -11,6 +11,10 @@ class Utils:
         return numpy.array(item).astype(numpy.float)
 
     @staticmethod
+    def get_year_from_name(name: str) -> int:
+        return int(re.findall('\(([^)]+)', name)[-1])
+
+    @staticmethod
     def get_yaml_content(file: str) -> Dict:
         with open(file, "r") as ymlfile:
             fl = yaml.safe_load(ymlfile)
