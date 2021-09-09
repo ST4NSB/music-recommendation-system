@@ -1,3 +1,5 @@
+from app.repository.elasticsearch_context import ESContext
+from elasticsearch.client import Elasticsearch
 from app.getsongs import GetSongs
 import os, logging
 from app.repository.db_context import DBContext
@@ -20,7 +22,8 @@ api = Api(app)
 logging.basicConfig(filename=logger_fn,level=logging.DEBUG)
 
 mongo_db = DBContext(env.DB_USER_NAME, env.DB_USER_PASS, env.DB_CLUSTER)
-rs = RecommendationSystem(logger=app.logger, db=mongo_db, cfg=cfg, rpath=app.root_path, yt_api_key = env.YT_API_KEY, es_host = env.ELASTICSEARCH_HOST)
+es = ESContext(env.ELASTICSEARCH_HOST)
+rs = RecommendationSystem(logger=app.logger, db=mongo_db, es=es, cfg=cfg, rpath=app.root_path, yt_api_key = env.YT_API_KEY)
 
 api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 api.add_resource(RandomSongs, '/api/recommender/randomsongs', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})

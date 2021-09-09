@@ -1,4 +1,8 @@
 
+from app.repository.elasticsearch_context import ESContext
+from app.repository.db_context import DBContext
+from logging import Logger
+from types import FunctionType
 from typing import Any, Dict, List, Optional, Tuple
 from flask import abort
 import requests, random, re
@@ -13,62 +17,24 @@ from elasticsearch import Elasticsearch
 
 class RecommendationSystem:
 
-    def __init__(self, logger, db, cfg, rpath, yt_api_key, es_host):
+    def __init__(self, logger: Logger, db: DBContext, es: ESContext, cfg: Dict, rpath: str, yt_api_key: str):
         self.logger = logger
         self.db = db
         self.cfg = cfg
         self.rpath = rpath
         self.yt_api_key = yt_api_key
+        self.es = es
 
         self.__songs_dataset = self.__get_processed_dataset()
-        self.es = Elasticsearch(es_host)
-        self.__configure_elasticsearch()
+        self.es.configure(self.__songs_dataset)
+        self.logger.info(f" * Loaded items in Elastic Search")
         
         self.logger.info(f" * Number of songs: {len(self.__songs_dataset)}")
         self.logger.info(
             f" * First 10 songs from dataset: { list(self.__songs_dataset.items())[0:10] }"
         )
-
-    def __configure_elasticsearch(self, delete_docs:bool=False) -> None:
-        if not self.es.indices.exists(index="music"):
-            self.es.indices.create(index='music')
-        
-        if delete_docs:
-            self.es.delete_by_query(
-                index="music",
-                doc_type="songs",
-                body={
-                    "query": {
-                        "match_all" : {}
-                    }
-                }
-            )
-
-        items = self.es.search(
-            index="music",
-            doc_type="songs",
-            body={
-                "query": {
-                    "match_all" : {}
-                },
-                "size": 0
-            }
-        )
-
-        if items['hits']['total']['value'] == 0:
-            body = []
-            for key, value in self.__songs_dataset.items():
-                body.append({'index': {'_id': key}})
-                info_body = {
-                    'name': value['name'],
-                    'artists': value['artists']
-                }
-                body.append(info_body)
-            self.es.bulk(index='music', doc_type='songs', body=body)
-
-        self.logger.info(f" * Loaded items in Elastic Search")
+      
  
-
     def __get_processed_dataset(self) -> Dict:
         feature_json = Utils.read_json(filename=self.cfg['dataset']['curated'])
         if feature_json:
@@ -132,24 +98,7 @@ class RecommendationSystem:
         return normalized_value * weight
 
     def get_random_songs(self, processed_songs: Dict) -> List[Dict]:
-        search_res = self.es.search(
-            index="music",
-            doc_type="songs",
-            body={
-                "query": {
-                    "function_score": {
-                        "functions": [
-                            {
-                                "random_score": {
-                                    "seed": random.randint(0, 999999999)
-                                }
-                            }
-                        ]
-                    }
-                },
-                "size": 300
-            }
-        )
+        search_res = self.es.get_random_items()
 
         results = []
         for sr in search_res['hits']['hits']:
@@ -171,20 +120,7 @@ class RecommendationSystem:
         return results
 
     def get_song_names(self, search_query: str) -> List[Dict]:
-        search_res = self.es.search(
-            index="music",
-            doc_type="songs",
-            body={
-                "size": self.cfg['distance_algorithm']['query_songs_limit'],
-                "query": {
-                    "combined_fields": {
-                        "query": search_query,
-                        "fields": [ "name", "artists"],
-                        "operator": "or"
-                    }
-                }
-            }
-        )
+        search_res = self.es.get_item_by_query(search_query, self.cfg['distance_algorithm']['query_songs_limit'])
 
         if len(search_res) == 0:
             abort(404, f"Couldn't find any songs for '{search_query}'")
@@ -261,7 +197,7 @@ class RecommendationSystem:
         
         return next_song
 
-    def __get_all_songs_distances(self, processed_songs: Dict, distmax: function, distmin: function, eval_func: function) -> Dict:
+    def __get_all_songs_distances(self, processed_songs: Dict, distmax: FunctionType, distmin: FunctionType, eval_func: FunctionType) -> Dict:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
