@@ -1,5 +1,5 @@
 
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from flask import abort
 import requests, random, re
 import pandas as pd
@@ -13,7 +13,7 @@ from elasticsearch import Elasticsearch
 
 class RecommendationSystem:
 
-    def __init__(self, logger, db, cfg, rpath, yt_api_key, es_host) -> None:
+    def __init__(self, logger, db, cfg, rpath, yt_api_key, es_host):
         self.logger = logger
         self.db = db
         self.cfg = cfg
@@ -110,7 +110,7 @@ class RecommendationSystem:
         Utils.save_json(songs, self.rpath, filename=self.cfg['dataset']['curated'])
         return songs
 
-    def __get_minmax_values(self, df) -> Dict:
+    def __get_minmax_values(self, df: Any) -> Dict:
         Minmax = namedtuple('Minmax', ('min, max'))
         return {
             'acousticness': Minmax(min=min(df['acousticness']), max=max(df['acousticness'])),
@@ -155,6 +155,9 @@ class RecommendationSystem:
         for sr in search_res['hits']['hits']:
             if len(results) >= self.cfg['distance_algorithm']['query_songs_limit']:
                 break
+
+            if sr['_id'] in processed_songs['liked'] or sr['_id'] in processed_songs['skipped']:
+                continue
 
             if Utils.get_year_from_name(sr['_source']['name']) < 2015:
                 if random.uniform(0, 1) < 0.8:
@@ -241,7 +244,7 @@ class RecommendationSystem:
         self.logger.info(f" * [GetNextSong]Result: {result}, type: {type(result)}")
         return result
 
-    def __get_song_from_db(self, processed_songs, user_id) -> Optional[Dict]:
+    def __get_song_from_db(self, processed_songs: Dict, user_id: str) -> Optional[Dict]:
         calculated_distances = self.db.get_user_songs(user_id)
         self.logger.info(f" * [GetNextSong]Distances from db: {calculated_distances}")
         
@@ -258,7 +261,7 @@ class RecommendationSystem:
         
         return next_song
 
-    def __get_all_songs_distances(self, processed_songs, distmax, distmin, eval_func) -> Dict:
+    def __get_all_songs_distances(self, processed_songs: Dict, distmax: function, distmin: function, eval_func: function) -> Dict:
         distances, liked_songs = defaultdict(lambda: {'name': '', 'distance_value': 0}), []
 
         for song in processed_songs['liked']:
@@ -282,14 +285,14 @@ class RecommendationSystem:
 
         return dict(distances)
 
-    def __get_videoId(self, name):
+    def __get_videoId(self, name: str) -> Optional[str]:
         song_name = f"{name} Official video"
         youtube_id = self.__get_videoId_from_api(song_name)
         if not youtube_id:
             youtube_id = self.__get_videoId_from_google(song_name)
         return youtube_id
     
-    def __get_videoId_from_api(self, song_name) -> Optional[str]:
+    def __get_videoId_from_api(self, song_name: str) -> Optional[str]:
         url = f"https://youtube.googleapis.com/youtube/v3/search?maxResults=1&regionCode=US&key={self.yt_api_key}&type=video&q={song_name}"
         data = requests.get(url).json()
         
@@ -298,7 +301,7 @@ class RecommendationSystem:
         
         return data['items'][0]['id']['videoId']
 
-    def __get_videoId_from_google(self, song_name) -> Optional[str]:
+    def __get_videoId_from_google(self, song_name: str) -> Optional[str]:
         search_result_list = list(search(query=song_name, tld="com", num=20, stop=3, pause=1))
         
         video_url = None

@@ -10,7 +10,7 @@ class GetSongs(Resource):
         self.rs = rs
         self.api_key = api_key
 
-    def get(self, name) -> Response:
+    def get(self, name: str) -> Response:
         try:
             key = request.headers.get('API-Key')
             if key != self.api_key:
