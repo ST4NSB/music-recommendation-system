@@ -4,12 +4,11 @@ const Home = () => {
 
     return (
         <>
-            <Redirect to='/search'></Redirect>
-            
+            <h1>Music Recommender System</h1>
+
             <div>This is home</div>
             <Link to='/search'>go to Search</Link>
             
-
         </>
     );
 }
