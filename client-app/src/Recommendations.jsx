@@ -1,6 +1,6 @@
 
 
-export const Recommendations = (props) => {
+const Recommendations = (props) => {
     return (
         <div>recommendations</div>
     );

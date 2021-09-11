@@ -1,6 +1,6 @@
 
 
-export const Search = (props) => {
+const Search = (props) => {
     return (
         <div>search</div>
     );
