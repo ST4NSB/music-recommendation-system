@@ -1,6 +1,6 @@
 import { Link, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
-import { increaseCounter, decreaseCounter } from './redux/actions/counter.actions'
+import { increaseCounter, decreaseCounter } from './actions/counter.actions'
 
 const Home = () => {
     const counter = useSelector(state => state.counter);
