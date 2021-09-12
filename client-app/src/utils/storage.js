@@ -3,7 +3,7 @@ import getUIDv4 from "./common";
 const createUserDetails = () => {
     const uid = JSON.parse(localStorage.getItem('userId'));
     
-    if (uid === null) {  
+    if (!uid) {  
         localStorage.setItem("userId", JSON.stringify(getUIDv4()));
         localStorage.setItem("likedSongs", JSON.stringify([]));
         localStorage.setItem("skippedSongs", JSON.stringify([]));

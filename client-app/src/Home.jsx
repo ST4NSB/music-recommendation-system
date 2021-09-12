@@ -2,11 +2,10 @@ import { Link, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { addLikedSong, clearLikedSongsList } from './actions/likedSongs.actions'
 import { addSkippedSong, clearSkippedSongsList } from "./actions/skippedSongs.actions";
+import ClearPreferences from "./components/ClearPreferences";
 
 const Home = () => {
-    const userId = useSelector(state => state.userId);
-    const likedSongs = useSelector(state => state.likedSongs);
-    const skippedSongs = useSelector(state => state.skippedSongs);
+    const {userId, likedSongs, skippedSongs} = useSelector(state => state);
     const dispatch = useDispatch();
 
     return (
@@ -17,12 +16,9 @@ const Home = () => {
             <div>{likedSongs}</div>
             <div>{skippedSongs}</div>
 
-            <button onClick={() => dispatch(addLikedSong('like'))}>inc</button>
-            <button onClick={() => dispatch(clearLikedSongsList())}>desc</button>
-
-
-            <button onClick={() => dispatch(addSkippedSong('skip'))}>inc</button>
-            <button onClick={() => dispatch(clearSkippedSongsList())}>desc</button>
+            <button onClick={() => dispatch(addLikedSong('like'))}>add like</button>
+            <button onClick={() => dispatch(addSkippedSong('skip'))}>add skip</button>
+            <ClearPreferences/>
 
 
 
