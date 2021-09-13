@@ -12,16 +12,16 @@ const createUserDetails = () => {
 
 export const setLikedSongs = (liked) => {
     createUserDetails();
-    const uid = JSON.parse(localStorage.getItem('likedSongs'));
-    uid.push(liked);
-    localStorage.setItem("likedSongs", JSON.stringify(uid));
+    const likedSongs = JSON.parse(localStorage.getItem('likedSongs'));
+    likedSongs.push(liked);
+    localStorage.setItem("likedSongs", JSON.stringify(likedSongs));
 }
 
 export const setSkippedSongs = (skipped) => {
     createUserDetails();
-    const uid = JSON.parse(localStorage.getItem('skippedSongs'));
-    uid.push(skipped);
-    localStorage.setItem("skippedSongs", JSON.stringify(uid));
+    const skippedSongs = JSON.parse(localStorage.getItem('skippedSongs'));
+    skippedSongs.push(...skipped);
+    localStorage.setItem("skippedSongs", JSON.stringify(skippedSongs));
 }
 
 export const clearLikedSongs = () => {
@@ -32,6 +32,13 @@ export const clearLikedSongs = () => {
 export const clearSkippedSongs = () => {
     createUserDetails();
     localStorage.setItem("skippedSongs", JSON.stringify([]));
+}
+
+export const removeSkippedSong = (songId) => {
+    createUserDetails();
+    const skippedSongs = JSON.parse(localStorage.getItem('skippedSongs'));
+    const newSongs = skippedSongs.filter(id => id !== songId);
+    localStorage.setItem("skippedSongs", JSON.stringify(newSongs));
 }
 
 export const getUserId = () => {
