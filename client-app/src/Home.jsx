@@ -1,30 +1,15 @@
-import { Link, Redirect } from "react-router-dom";
-import { useSelector, useDispatch } from 'react-redux';
-import { addLikedSong, clearLikedSongsList } from './actions/likedSongs.actions'
-import { addSkippedSong, clearSkippedSongsList } from "./actions/skippedSongs.actions";
+import { Link } from "react-router-dom";
 import ClearPreferencesButton from "./components/ClearPreferencesButton";
+import Header from "./components/Header";
 
 const Home = () => {
-    const {userId, likedSongs, skippedSongs} = useSelector(state => state);
-    const dispatch = useDispatch();
-
     return (
         <>
+            <Header />
             <h1>Music Recommender System</h1>
-
-            <div>{userId}</div>
-            <div>{likedSongs}</div>
-            <div>{skippedSongs}</div>
-
-            <button onClick={() => dispatch(addLikedSong('like'))}>add like</button>
-            <button onClick={() => dispatch(addSkippedSong('skip'))}>add skip</button>
+            <p>Information to be added here ....</p>
             <ClearPreferencesButton />
-
-
-
-            <div>This is home</div>
-            <Link to='/search'>go to Search</Link>
-            
+            <Link to='/search'>Start discovering</Link>
         </>
     );
 }

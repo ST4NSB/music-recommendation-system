@@ -1,8 +1,14 @@
+import Header from "./components/Header";
+import SearchContent from "./components/SearchContent";
 
-
-const Search = (props) => {
+const Search = () => {
     return (
-        <div>search</div>
+        <>
+            <Header />
+            <div>search</div>
+            
+            <SearchContent />
+        </>
     );
 }
 
