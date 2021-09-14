@@ -1,32 +1,54 @@
 import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
 import SearchBar from "./SearchBar";
+import SearchItem from "./SearchItem";
+import { getRandomSongsApi, getSongsApi } from "../utils/apiRequests";
 import { getSearchResults } from "../actions/searchResults.actions";
-import axios from "axios";
-import { randomsongs } from "../utils/endpoints";
+import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSongs.actions";
+import { addLikedSong } from "../actions/likedSongs.actions";
 
 const SearchContext = () => {
     const { searchText, searchResults } = useSelector(state => state);
     const dispatch = useDispatch();
 
-    const getSearchedItems = () => {
-        const url = `${process.env.REACT_APP_HOST}${randomsongs}`, headers = {
-            'Content-Type': 'application/json'
-        };
-        axios.post(url, {headers}).then((response) => {
-            dispatch(getSearchResults(response.data));
-        });
+    useEffect(() => {
+        if (searchText.trim().length === 0) {
+            console.log("effect");
+            getRandomItems();
+        }
+    }, [searchText])
+
+    const getRandomItems = async () => {
+        const res = await getRandomSongsApi();
+        dispatch(getSearchResults(res));
+        dispatch(addSkippedSongs(res.map(x => x.id)));
     }
 
+    const getSearchItems = async () => {
+        const res = await getSongsApi(searchText);
+        dispatch(getSearchResults(res));
+    }
+
+    const addLikedItem = (id) => {
+        dispatch(addLikedSong(id));
+        dispatch(removeSkippedSongFromList(id));
+    }
 
     return (
         <>
             <SearchBar layoutClasses="shadow flex my-5 mx-16 bg-white" 
-                       action={getSearchedItems}
+                       action={getSearchItems}
                        inputValue={searchText} />
             
             <div className="">
-                {searchResults.map(x => x.name)}
+                {searchResults.map(x => 
+                    <SearchItem id={x.id} 
+                                name={x.name} 
+                                youtubeLink={`https://www.youtube.com/embed/${x.youtubeId}`}
+                                likeClick={addLikedItem} />)}
             </div>
+
+            <button onClick={getRandomItems}>Get next random songs</button>
         </>
     );
 }

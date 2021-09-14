@@ -1,11 +1,21 @@
 import { useHistory, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import SearchBar from "./SearchBar";
+import { getSongsApi } from "../utils/apiRequests";
+import { getSearchResults } from "../actions/searchResults.actions";
+import { addSkippedSongs } from "../actions/skippedSongs.actions";
+import { useSelector } from "react-redux";
 
 const Header = () => {
+    const searchText = useSelector(state => state.searchText);
     const location = useLocation();
     const history = useHistory();
     const dispatch = useDispatch();
+
+    const getSearchItems = async () => {
+        const res = await getSongsApi(searchText);
+        dispatch(getSearchResults(res));
+    }
 
     if (location.pathname !== '/search') {
         return (
@@ -19,7 +29,13 @@ const Header = () => {
                     </h1>
                 </div>
 
-                <SearchBar layoutClasses="shadow flex my-5" action={() => history.push('/search')} />
+                <SearchBar layoutClasses="shadow flex my-5" 
+                           action={async () => {
+                                if (searchText.trim().length !== 0) {
+                                    history.push('/search'); 
+                                    await getSearchItems();
+                               }
+                            }} />
             </header>
         );
     }

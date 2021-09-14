@@ -6,7 +6,12 @@ const reducer = (state = getUserSkippedSongs(), action) => {
     switch (action.type) {
         case ADD_SKIPPED: {
             setSkippedSongs(action.payload);
-            return [ ...state, ...action.payload];
+            action.payload.map(x => {
+                if (!state.includes(x)) {
+                    state.push(x);
+                }
+            });
+            return state;
         }
         case CLEAR_SKIPPED: {
             clearSkippedSongs();
