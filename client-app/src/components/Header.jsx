@@ -1,8 +1,6 @@
 import { useHistory, useLocation } from "react-router-dom";
-import { changeSearchText } from "../actions/searchText.actions";
 import { useDispatch } from "react-redux";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import SearchBar from "./SearchBar";
 
 const Header = () => {
     const location = useLocation();
@@ -21,28 +19,7 @@ const Header = () => {
                     </h1>
                 </div>
 
-                <div className="shadow flex my-5">
-                    <input  type="search" 
-                            name="nav_search"
-                            className="focus:outline-none w-full rounded p-2 my-1"
-                            placeholder="Search" 
-                            onChange={(e) => {
-                                dispatch(changeSearchText(e.target.value));
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    history.push('/search');
-                                }
-                            }} />
-                
-                    <button type="submit" 
-                       className="bg-white border-l-2 w-auto flex justify-end items-center text-blue-500 p-2 hover:text-blue-400"
-                       onClick={() => {
-                            history.push('/search');
-                       }}>
-                           <FontAwesomeIcon icon={faSearch} />
-                    </button>
-                </div>
+                <SearchBar layoutClasses="shadow flex my-5" action={() => history.push('/search')} />
             </header>
         );
     }

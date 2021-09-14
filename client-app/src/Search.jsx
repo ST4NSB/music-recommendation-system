@@ -1,14 +1,18 @@
 import Header from "./components/Header";
-import SearchContent from "./components/SearchContent";
+import SearchContext from "./components/SearchContext";
 import ClearPreferencesButton from "./components/ClearPreferencesButton";
+import SearchBar from "./components/SearchBar";
+import Main from "./components/Main";
 
 const Search = () => {
     return (
         <>
             <Header />
-            <div>search</div>
-            <ClearPreferencesButton />
-            <SearchContent />
+            <Main>
+                <div>search</div>
+                <ClearPreferencesButton />
+                <SearchContext />
+            </Main>
         </>
     );
 }

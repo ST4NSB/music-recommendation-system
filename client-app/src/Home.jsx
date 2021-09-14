@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import ClearPreferencesButton from "./components/ClearPreferencesButton";
 import Header from "./components/Header";
+import Main from "./components/Main";
 import './css/index.css';
 
 const Home = () => {
     return (
         <>
             <Header />
-            <main className="min-h-screen bg-green-600">
+            <Main>
                 <h1>Music Recommender System</h1>
                 <p>Information to be added here ....</p>
                 <ClearPreferencesButton />
@@ -15,7 +16,7 @@ const Home = () => {
                         to='/search'>
                         Start discovering
                 </Link>
-            </main>
+            </Main>
         </>
     );
 }

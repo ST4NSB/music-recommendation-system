@@ -1,0 +1,2 @@
+const UPDATE_RESULTS = "UPDATE_RESULTS"
+export default UPDATE_RESULTS;

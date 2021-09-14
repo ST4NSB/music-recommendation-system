@@ -3,12 +3,14 @@ import userIdReducer from './reducers/userId.reducer';
 import likedSongsReducer from './reducers/likedSongs.reducer';
 import skippedSongsReducer from './reducers/skippedSongs.reducer';
 import searchTextReducer from './reducers/searchText.reducer';
+import searchResultsReducer from './reducers/searchResults.reducer'
 
 const allReducers = combineReducers({
     userId: userIdReducer,
     likedSongs: likedSongsReducer,
     skippedSongs: skippedSongsReducer,
     searchText: searchTextReducer,
+    searchResults: searchResultsReducer,
 });
 
 export default allReducers;

@@ -1,0 +1,1 @@
+export const randomsongs = '/api/recommender/randomsongs';
