@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import SearchBar from "./SearchBar";
 import { getSongsApi } from "../utils/apiRequests";
 import { getSearchResults } from "../actions/searchResults.actions";
-import { addSkippedSongs } from "../actions/skippedSongs.actions";
 import { useSelector } from "react-redux";
 
 const Header = () => {

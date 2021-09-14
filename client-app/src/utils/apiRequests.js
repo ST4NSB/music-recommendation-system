@@ -8,7 +8,7 @@ export const getRandomSongsApi = async () => {
         'Content-Type': 'application/json'
     };
     await axios.post(url, {headers}).then((response) => {
-        return response.data;
+        return await response.data;
     });
 }
 

@@ -11,10 +11,10 @@ const SearchContext = () => {
     const { searchText, searchResults } = useSelector(state => state);
     const dispatch = useDispatch();
 
-    useEffect(() => {
+    useEffect(async () => {
         if (searchText.trim().length === 0) {
             console.log("effect");
-            getRandomItems();
+            await getRandomItems();
         }
     }, [searchText])
 
