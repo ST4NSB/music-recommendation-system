@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import SearchBar from "./SearchBar";
-import SearchItem from "./SearchItem";
+import ResultItem from "./ResultItem";
 import { getRandomSongsApi, getSongsApi } from "../utils/apiRequests";
 import { getSearchResults } from "../actions/searchResults.actions";
 import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSongs.actions";
@@ -24,7 +24,7 @@ const SearchContext = () => {
         dispatch(addSkippedSongs(res.map(x => x.id)));
     }
 
-    const getSearchItems = async () => {
+    const getResultItems = async () => {
         const res = await getSongsApi(searchText);
         dispatch(getSearchResults(res));
     }
@@ -37,14 +37,14 @@ const SearchContext = () => {
     return (
         <>
             <SearchBar layoutClasses="shadow flex my-5 mx-16 bg-white" 
-                       action={getSearchItems}
+                       action={getResultItems}
                        inputValue={searchText} />
             
             <div className="">
                 {searchResults.map(x => 
-                    <SearchItem id={x.id} 
+                    <ResultItem id={x.id} 
                                 name={x.name} 
-                                youtubeLink={`https://www.youtube.com/embed/${x.youtubeId}`}
+                                youtubeId={x.youtubeId}
                                 likeClick={addLikedItem} />)}
             </div>
 
