@@ -8,20 +8,26 @@ import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSo
 import { addLikedSong } from "../actions/likedSongs.actions";
 
 const SearchContext = () => {
-    const { searchText, searchResults } = useSelector(state => state);
+    const { userId, likedSongs, skippedSongs, searchText, searchResults } = useSelector(state => state);
     const dispatch = useDispatch();
 
     useEffect(async () => {
         if (searchText.trim().length === 0) {
-            console.log("effect");
             await getRandomItems();
         }
     }, [searchText])
 
     const getRandomItems = async () => {
-        const res = await getRandomSongsApi();
-        dispatch(getSearchResults(res));
-        dispatch(addSkippedSongs(res.map(x => x.id)));
+        const body = {
+            'userId': userId,
+            'liked': likedSongs,
+            'skipped': skippedSongs
+        };
+        await getRandomSongsApi(body).then(response => {
+            const res = response.data;
+            dispatch(getSearchResults(res));
+            dispatch(addSkippedSongs(res.map(x => x.id)));
+        });        
     }
 
     const getResultItems = async () => {

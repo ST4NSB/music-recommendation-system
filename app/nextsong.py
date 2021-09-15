@@ -19,6 +19,7 @@ class NextSong(Resource):
             result = self.rs.get_next_song(request.json)
             response = make_response(jsonify(result), 200)
             response.headers["Content-Type"] = "application/json"
+            response.headers.add("Access-Control-Allow-Origin", "*")
             return response
         except Exception as e:
             if isinstance(e, HTTPException):

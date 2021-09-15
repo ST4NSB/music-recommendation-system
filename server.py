@@ -10,6 +10,9 @@ from app.nextsong import NextSong
 from app.randomsongs import RandomSongs
 from app.service.utils import Utils
 import env
+from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 logger_fn = 'info.log'
 cfg = Utils.get_yaml_content('config.yml')
@@ -18,6 +21,12 @@ if cfg['clean_log']:
     Utils.clean_log(logger_fn)
 
 app = Flask(__name__)  
+CORS(app)
+limiter = Limiter(
+  app,
+  key_func=get_remote_address,
+  default_limits=["10/second"]
+)
 api = Api(app)
 logging.basicConfig(filename=logger_fn,level=logging.DEBUG)
 
