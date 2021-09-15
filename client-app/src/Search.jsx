@@ -9,7 +9,6 @@ const Search = () => {
         <>
             <Header />
             <Main>
-                <div>search</div>
                 <ClearPreferencesButton />
                 <SearchContext />
             </Main>
