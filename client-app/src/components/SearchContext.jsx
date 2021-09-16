@@ -23,11 +23,14 @@ const SearchContext = () => {
             'liked': likedSongs,
             'skipped': skippedSongs
         };
-        await getRandomSongsApi(body).then(response => {
-            const res = response.data;
-            dispatch(getSearchResults(res));
-            dispatch(addSkippedSongs(res.map(x => x.id)));
-        });        
+        const res = await getRandomSongsApi(body);
+        dispatch(getSearchResults(res));
+        dispatch(addSkippedSongs(res.map(x => x.id)));
+        // await getRandomSongsApi(body).then(response => {
+        //     const res = response.data;
+        //     dispatch(getSearchResults(res));
+        //     dispatch(addSkippedSongs(res.map(x => x.id)));
+        // });        
     }
 
     const getResultItems = async () => {
