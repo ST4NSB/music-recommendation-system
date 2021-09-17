@@ -51,7 +51,8 @@ const SearchContext = () => {
             
             <div className="">
                 {searchResults.map(x => 
-                    <ResultItem id={x.id} 
+                    <ResultItem key={x.id}
+                                id={x.id} 
                                 name={x.name} 
                                 youtubeId={x.youtubeId}
                                 likeClick={addLikedItem} />)}

@@ -28,14 +28,15 @@ const RecommendationContext = () => {
 
     return (
         <>
-            <ResultItem id={currentSong.id}
-                                    name={currentSong.name}
-                                    youtubeId={currentSong.youtubeId}
-                                    likeClick={async () => {
-                                        dispatch(likeCurrentSong());
-                                        addLikedItem();
-                                        await getNextitem();
-                                    }} />
+            <ResultItem key={currentSong.id}
+                        id={currentSong.id}
+                        name={currentSong.name}
+                        youtubeId={currentSong.youtubeId}
+                        likeClick={async () => {
+                            dispatch(likeCurrentSong());
+                            addLikedItem();
+                            await getNextitem();
+                        }} />
 
             <button onClick={async () => {
                 if (!currentSong.liked) {
