@@ -49,7 +49,7 @@ const SearchContext = () => {
                        action={getResultItems}
                        inputValue={searchText} />
             
-            <div className="flex flex-wrap justify-center items-center w-10/12">
+            <div className="flex">
                 {searchResults.map(x => 
                     <ResultItem key={x.id}
                                 id={x.id} 
