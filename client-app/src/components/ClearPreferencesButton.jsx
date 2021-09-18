@@ -11,7 +11,7 @@ const ClearPreferencesButton  = () => {
     if (likedSongs.length > 0 || skippedSongs.length > 0) {
         return (
             <button 
-                className="clear" 
+                className="clear fixed" 
                 onClick={() => {
                     dispatch(clearLikedSongsList());
                     dispatch(clearSkippedSongsList());

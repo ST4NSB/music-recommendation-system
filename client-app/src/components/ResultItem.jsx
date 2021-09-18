@@ -5,7 +5,7 @@ const ResultItem = ({id, name, youtubeId, likeClick}) => {
 
     const renderLikeButton = () => {
         if (!likedSongs.includes(id)) {
-            return <button onClick={() => likeClick(id)}>LIKE</button>
+            return 
         }
         else {
             return <div className="">LIKED</div>
@@ -13,10 +13,11 @@ const ResultItem = ({id, name, youtubeId, likeClick}) => {
     }
 
     return (
-        <div id={id}>
-            <div><a href={`https://www.youtube.com/watch?v=${youtubeId}`}>{name}</a></div>
-            <iframe width="420" height="315" src={`https://www.youtube.com/embed/${youtubeId}`}></iframe>
-            {renderLikeButton()}
+        <div id={id}
+             className="w-96 bg-darken">
+            <iframe className="w-96 h-56" src={`https://www.youtube.com/embed/${youtubeId}`}></iframe>
+            <div className="text-center text-gradient-red font-bold"><a href={`https://www.youtube.com/watch?v=${youtubeId}`}>{name}</a></div>
+            <button class="text-milk" onClick={() => likeClick(id)}>{!likedSongs.includes(id)? 'Like' : 'LIKED'}</button>
         </div>
     );
 }

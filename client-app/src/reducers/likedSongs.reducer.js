@@ -6,7 +6,7 @@ const reducer = (state = getUserLikedSongs(), action) => {
     switch (action.type) {
         case ADD_LIKED: {
             setLikedSongs(action.payload);
-            return [ ...state, action.payload];
+            return state.includes(action.payload) ? state : [ ...state, action.payload];
         }
         case CLEAR_LIKED: {
             clearLikedSongs();

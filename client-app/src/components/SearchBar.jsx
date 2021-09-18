@@ -13,7 +13,7 @@ export const SearchBar = ({layoutClasses, action, inputValue}) => {
             <input type="search" 
                    name="nav_search"
                    value={inputValue}
-                   className="focus:outline-none w-full rounded p-2 my-1"
+                   className="focus:outline-none w-full rounded p-3"
                    placeholder="Search" 
                    onChange={(e) => {
                        dispatch(changeSearchText(e.target.value));
@@ -25,7 +25,7 @@ export const SearchBar = ({layoutClasses, action, inputValue}) => {
                    }} />
 
             <button type="submit" 
-                    className="bg-gradient-red border-l-2 w-auto flex justify-end items-center text-blue-500 p-2 hover:text-blue-400"
+                    className="bg-gradient-red border-l-2 w-auto flex justify-end items-center text-darken p-2 hover:text-gray-800"
                     onClick={() => {
                         if (searchText.trim().length !== 0) {
                             action();

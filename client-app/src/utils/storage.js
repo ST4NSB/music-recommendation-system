@@ -12,15 +12,15 @@ const createUserDetails = () => {
 
 export const setLikedSongs = (liked) => {
     createUserDetails();
-    const likedSongs = JSON.parse(localStorage.getItem('likedSongs'));
-    likedSongs.push(liked);
+    let likedSongs = JSON.parse(localStorage.getItem('likedSongs'));
+    likedSongs = likedSongs.includes(liked) ? likedSongs : [ ...likedSongs, liked];
     localStorage.setItem("likedSongs", JSON.stringify(likedSongs));
 }
 
 export const setSkippedSongs = (skipped) => {
     createUserDetails();
     const skippedSongs = JSON.parse(localStorage.getItem('skippedSongs'));
-    skipped.map(x => {
+    skipped.forEach(x => {
         if (!skippedSongs.includes(x)) {
             skippedSongs.push(x);
         }
