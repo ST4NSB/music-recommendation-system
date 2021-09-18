@@ -7,9 +7,10 @@ import { getNextSong, likeCurrentSong } from "../actions/currentSong.actions";
 import { addSkippedSongs } from "../actions/skippedSongs.actions";
 import { addLikedSong } from "../actions/likedSongs.actions";
 import { removeSkippedSongFromList } from "../actions/skippedSongs.actions";
+import { Link } from "react-router-dom";
 
 const RecommendationContext = () => {
-    const currentSong = useSelector(state => state.currentSong);
+    const { currentSong, likedSongs } = useSelector(state => state);
     const dispatch = useDispatch();
 
     const getNextitem = async () => {
@@ -26,7 +27,14 @@ const RecommendationContext = () => {
         await getNextitem();
     }, []);
 
-    return (
+    if (likedSongs.length < 3) 
+        return (
+            <>
+            <div>You need to like at least 3 songs!</div>
+            <Link to='/search'>Keep browsing..</Link>
+            </>
+        );
+    else return (
         <>
             <ResultItem key={currentSong.id}
                         id={currentSong.id}

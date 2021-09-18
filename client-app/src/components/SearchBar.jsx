@@ -25,7 +25,7 @@ export const SearchBar = ({layoutClasses, action, inputValue}) => {
                    }} />
 
             <button type="submit" 
-                    className="bg-white border-l-2 w-auto flex justify-end items-center text-blue-500 p-2 hover:text-blue-400"
+                    className="bg-gradient-red border-l-2 w-auto flex justify-end items-center text-blue-500 p-2 hover:text-blue-400"
                     onClick={() => {
                         if (searchText.trim().length !== 0) {
                             action();

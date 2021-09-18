@@ -29,12 +29,12 @@ const Header = () => {
     }
 
     const showRecommendedLink = () => {
-        if (location.pathname !== '/recommendations' && likedSongs.length >= 3)
+        if (location.pathname !== '/recommendations')
             return (<Link to='/recommendations'>GET RECOMMENDED SONG</Link>);
     }
 
     return (
-        <header className="border-b md:flex md:items-center md:justify-between p-4 pb-0 shadow-lg md:pb-4">
+        <header className="bg-milk border-b md:flex md:items-center md:justify-between p-4 pb-0 shadow-lg md:pb-4">
             <div className="flex items-center justify-between mb-4 md:mb-0">
                 <h1 className="leading-none text-xl text-grey-darkest">
                     <a className="no-underline text-grey-darkest hover:text-black" href="#">

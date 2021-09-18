@@ -1,7 +1,7 @@
 
 const Main = ({children}) => {
     return (
-        <main className="bg-blue-200 min-h-screen">
+        <main className="bg-milk min-h-screen">
             {children}
         </main>
     );    
