@@ -29,13 +29,14 @@ const RecommendationContext = () => {
 
     if (likedSongs.length < 3) 
         return (
-            <>
-            <div>You need to like at least 3 songs!</div>
-            <Link to='/search'>Keep browsing..</Link>
-            </>
+            <div className="flex flex-col justify-center items-center">
+                <div>You need to like at least 3 songs!</div>
+                <Link to='/search'>Keep browsing..</Link>
+            </div>
         );
     else return (
-        <>
+        <div className="flex flex-col justify-center items-center pt-14">
+            <p>System recommended this song, hit Like if you like it or next if you want to get next song</p>
             <ResultItem key={currentSong.id}
                         id={currentSong.id}
                         name={currentSong.name}
@@ -44,15 +45,17 @@ const RecommendationContext = () => {
                             dispatch(likeCurrentSong());
                             addLikedItem();
                             await getNextitem();
-                        }} />
+                        }}
+                        itemClasses={'w-4/12'} />
 
-            <button onClick={async () => {
-                if (!currentSong.liked) {
-                    dispatch(addSkippedSongs([currentSong.id]));
-                }
-                await getNextitem();
-            }}>NEXT</button>
-        </>
+            <button className="px-4 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300"
+                    onClick={async () => {
+                        if (!currentSong.liked) {
+                            dispatch(addSkippedSongs([currentSong.id]));
+                        }
+                        await getNextitem();
+                    }}>NEXT &rsaquo;&rsaquo;</button>
+        </div>
     );
 };
 

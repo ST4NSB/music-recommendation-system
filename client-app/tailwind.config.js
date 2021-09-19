@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       colors: {
         milk: '#F9FAF4',
-        tealy: '#E7ECD3',
+        tealy: '#EEECDE',
         darken: '#4A6163',
         gradient: {
           orange: '#F9A66C',
