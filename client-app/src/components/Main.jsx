@@ -1,7 +1,7 @@
 
 const Main = ({children}) => {
     return (
-        <main className="bg-theme-darker min-h-screen pt-7 font-sans">
+        <main className="bg-theme-dark-xl min-h-screen pt-7 font-sans">
             {children}
         </main>
     );    

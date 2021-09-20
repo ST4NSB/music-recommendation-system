@@ -47,7 +47,7 @@ const Header = () => {
     }
 
     return (
-        <header className="font-sans sticky top-0 z-50 bg-theme-dark md:flex md:items-center p-4 pb-0 shadow-lg md:pb-4 mobile:pb-5">
+        <header className="font-sans sticky top-0 z-50 bg-theme-dark-xm md:flex md:items-center p-4 pb-0 shadow-lg md:pb-4 mobile:pb-5">
             <div className="mb-4 md:mb-0">
                     <a className="no-underline text-grey-darkest" href="/">
                         <img src=""
@@ -57,7 +57,7 @@ const Header = () => {
             </div>
 
             <nav className="w-full">
-                <button className={`align-middle ${navButtonStyle}`}><a href='https://github.com/ST4NSB/music-recommendation-system'><img className="h-6 w-6" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" /></a></button>
+                <button className={`align-middle ${navButtonStyle}`}><a href='https://github.com/ST4NSB/music-recommendation-system'><img className="h-6 w-6" alt="github logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" /></a></button>
                 <Link className={(location.pathname === '/search') ? navButtonStyle + navButtonActive : navButtonStyle } to='/search'>Browse</Link>
                 <ClearPreferencesButton buttonStyle={navButtonStyle} />
                 <Link className={(location.pathname === '/recommendations') ? navButtonStyle + navButtonActive : navButtonStyle } to='/recommendations'>

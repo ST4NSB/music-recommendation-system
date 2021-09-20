@@ -56,12 +56,12 @@ const SearchContext = () => {
                        action={getResultItems}
                        inputValue={searchText} />
             
-            <div className="flex flex-col justify-center items-center">
+            <div className="flex flex-col justify-center items-center py-3">
                 <StyledButton text="Get random songs"
                               onClickEvent={getRandomItems} />
             </div>
 
-            <div className="flex flex-wrap justify-evenly flex-row pt-8">
+            <div className="flex flex-wrap justify-evenly flex-row py-6">
                 {searchResults.map(x => 
                     <ResultItem key={x.id}
                                 id={x.id} 

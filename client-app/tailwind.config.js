@@ -13,8 +13,11 @@ module.exports = {
       colors: {
         theme: {
           black: '#111827',
-          dark: '#1F2937',
-          darker: '#1c2531',
+          dark: {
+            xs: '#283445',
+            xm: '#1F2937',
+            xl: '#1c2531',
+          },
           searchbar: '#374151',
           gray: '#A8ADB5',
           white: '#dee0e3'

@@ -1,15 +1,21 @@
-import { useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import LikeButton from "./LikeButton";
 
 const ResultItem = ({id, name, youtubeId, likeClick, itemClasses}) => {
-    const likedSongs = useSelector(state => state.likedSongs);
-
     return (
-        <div id={id} className={`mb-6 bg-darken border-4 border-gradient-orange ${itemClasses}`}>
-            <iframe className='w-full h-96' src={`https://www.youtube.com/embed/${youtubeId}`} />
-            <div title={name} className="p-3 text-center text-base text-gradient-red font-bold whitespace-nowrap overflow-ellipsis overflow-hidden">
-                <a href={`https://www.youtube.com/watch?v=${youtubeId}`}>{name}</a>
+        <div id={id} className={`mb-10 bg-theme-dark-xs shadow-xl rounded-lg ${itemClasses}`}>
+            <div className="rounded-xl shadow-xl w-11/12 h-96 relative overflow-hidden mx-auto mt-5">
+                <iframe className='w-full h-96' src={`https://www.youtube.com/embed/${youtubeId}`} />
             </div>
-            <button class="text-milk content-center mt-0 w-full pb-3" onClick={() => likeClick(id)}>{!likedSongs.includes(id)? 'Like' : 'LIKED'}</button>
+            <div title={name} className="p-3 text-center text-base text-theme-gray font-bold whitespace-nowrap overflow-ellipsis overflow-hidden">
+                <a href={`https://www.youtube.com/watch?v=${youtubeId}`}>
+                    {name}
+                    <span><FontAwesomeIcon className="pl-2 h-5 text-red-600"
+                                           icon={faExternalLinkAlt} /></span>
+                </a>
+            </div>
+            <LikeButton id={id} onClickEvent={likeClick} />
         </div>
     );
 }

@@ -15,7 +15,7 @@ const Home = () => {
                     <h1>Music Recommender System</h1>
                     <p>Information to be added here ....</p>
                     <StyledButton
-                        text="Start discovering"
+                        text="Start browsing"
                         onClickEvent={() => history.push('/search')}
                     />
                 </div>
