@@ -6,6 +6,7 @@ import { getRandomSongsApi, getSongsApi } from "../utils/apiRequests";
 import { getSearchResults } from "../actions/searchResults.actions";
 import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSongs.actions";
 import { addLikedSong } from "../actions/likedSongs.actions";
+import StyledButton from "./StyledButton";
 
 const SearchContext = () => {
     const { userId, likedSongs, skippedSongs, searchText, searchResults } = useSelector(state => state);
@@ -49,13 +50,15 @@ const SearchContext = () => {
 
     return (
         <>
-            <SearchBar layoutClasses="shadow flex" 
+            <SearchBar layoutClasses="flex-col justify-center items-center pb-5" 
+                       inputWidthClass="w-11/12"
+                       buttonPosition="left-4per top-1"
                        action={getResultItems}
                        inputValue={searchText} />
             
             <div className="flex flex-col justify-center items-center">
-                <button className="px-4 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300"
-                        onClick={getRandomItems}>Get random songs</button>
+                <StyledButton text="Get random songs"
+                              onClickEvent={getRandomItems} />
             </div>
 
             <div className="flex flex-wrap justify-evenly flex-row pt-8">

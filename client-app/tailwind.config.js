@@ -3,6 +3,9 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Helvetica', 'Verdana', 'Arial', 'sans-serif'],
+      },
       screens: {
         'mobile': '0px',
         // => @media (min-width: 0px) { ... }
@@ -11,6 +14,7 @@ module.exports = {
         theme: {
           black: '#111827',
           dark: '#1F2937',
+          darker: '#1c2531',
           searchbar: '#374151',
           gray: '#A8ADB5',
           white: '#dee0e3'
@@ -18,8 +22,7 @@ module.exports = {
       }
     }
   },
-  variants: {
-    extend: {},
-  },
+  variants: {},
+  extend: {},
   plugins: [],
 }
