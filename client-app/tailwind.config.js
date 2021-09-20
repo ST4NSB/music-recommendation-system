@@ -3,14 +3,17 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      screens: {
+        'mobile': '0px',
+        // => @media (min-width: 0px) { ... }
+      },
       colors: {
-        milk: '#F9FAF4',
-        tealy: '#EEECDE',
-        darken: '#4A6163',
-        gradient: {
-          orange: '#F9A66C',
-          yellow: '#FFC94B',
-          red: '#F17A7E'
+        theme: {
+          black: '#111827',
+          dark: '#1F2937',
+          searchbar: '#374151',
+          gray: '#A8ADB5',
+          white: '#dee0e3'
         }
       }
     }

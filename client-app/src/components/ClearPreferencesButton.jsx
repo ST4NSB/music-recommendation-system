@@ -3,27 +3,25 @@ import { clearLikedSongsList } from '../actions/likedSongs.actions'
 import { clearSkippedSongsList } from "../actions/skippedSongs.actions";
 import { useHistory } from "react-router-dom";
 
-const ClearPreferencesButton  = () => {
+const ClearPreferencesButton  = ({buttonStyle}) => {
     const { likedSongs, skippedSongs } = useSelector(state => state);
     const dispatch = useDispatch();
     const history = useHistory();
 
-    if (likedSongs.length > 0 || skippedSongs.length > 0) {
-        return (
-            <button 
-                className="clear fixed" 
-                onClick={() => {
-                    dispatch(clearLikedSongsList());
-                    dispatch(clearSkippedSongsList());
-                    history.push("/search");
-                }}>
-                    Clear Preferences
-            </button>
-        );
-    }
-    else return (
-        <></>
+    return (
+        <button 
+            className={(likedSongs.length === 0 && skippedSongs.length === 0) ? 
+                buttonStyle + " cursor-not-allowed	" 
+                : buttonStyle}
+            disabled={likedSongs.length === 0 && skippedSongs.length === 0}
+            onClick={() => {
+                dispatch(clearLikedSongsList());
+                dispatch(clearSkippedSongsList());
+            }}>
+                Clear Preferences
+        </button>
     );
+    
 }
 
 export default ClearPreferencesButton;

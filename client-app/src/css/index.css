@@ -5,3 +5,7 @@
 .flex-basis-3 {
     flex-basis: 30%;
 }
+
+.font-verdana {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}

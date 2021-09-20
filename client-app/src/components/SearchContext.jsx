@@ -49,7 +49,7 @@ const SearchContext = () => {
 
     return (
         <>
-            <SearchBar layoutClasses="shadow flex my-5 mx-16 bg-white" 
+            <SearchBar layoutClasses="shadow flex" 
                        action={getResultItems}
                        inputValue={searchText} />
             

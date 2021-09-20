@@ -9,11 +9,11 @@ export const SearchBar = ({layoutClasses, action, inputValue}) => {
     const dispatch = useDispatch();
 
     return (
-        <div className={layoutClasses}>
+        <div className={`shadow flex ${layoutClasses}`}>
             <input type="search" 
                    name="nav_search"
                    value={inputValue}
-                   className="focus:outline-none w-full rounded p-3"
+                   className="pl-10 pt-2 pb-2 m-0 focus:outline-none bg-theme-searchbar text-theme-gray w-full rounded-md"
                    placeholder="Search" 
                    onChange={(e) => {
                        dispatch(changeSearchText(e.target.value));
@@ -25,7 +25,7 @@ export const SearchBar = ({layoutClasses, action, inputValue}) => {
                    }} />
 
             <button type="submit" 
-                    className="bg-gradient-red border-l-2 w-auto flex justify-end items-center text-darken p-2 hover:text-gray-800"
+                    className="text-theme-gray absolute left-1 top-1 w-auto flex justify-end items-center text-darken p-2 hover:text-theme-dark"
                     onClick={() => {
                         if (searchText.trim().length !== 0) {
                             action();
