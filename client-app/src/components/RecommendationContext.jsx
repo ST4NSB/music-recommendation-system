@@ -60,13 +60,11 @@ const RecommendationContext = () => {
                         likeClick={async () => {
                             dispatch(likeCurrentSong());
                             addLikedItem();
-                            await getNextitem();
                         }}
                         itemClasses={'w-4/12'} />
 
             <StyledButton text="NEXT &rsaquo;&rsaquo;"
                           onClickEvent={async () => {
-                            dispatch(getNextSong(getSingleSkeleton('w-4/12')));
                             if (!currentSong.liked) {
                                 dispatch(addSkippedSongs([currentSong.id]));
                             }

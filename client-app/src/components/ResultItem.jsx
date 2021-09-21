@@ -15,6 +15,8 @@ const ResultItem = ({id, name, youtubeId, likeClick, itemClasses, emptyItem}) =>
                             <div class="space-y-3">
                                 <div class="h-4 bg-theme-gray rounded"></div>
                                 <div class="h-4 bg-theme-gray rounded w-5/6"></div>
+                                <div class="h-4 bg-theme-gray rounded w-4/6"></div>
+                                <div class="h-4 bg-theme-gray rounded w-full"></div>
                             </div>
                         </div>
                     </div>

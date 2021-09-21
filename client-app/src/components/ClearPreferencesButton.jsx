@@ -1,20 +1,17 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { clearLikedSongsList } from '../actions/likedSongs.actions'
 import { clearSkippedSongsList } from "../actions/skippedSongs.actions";
-import { useHistory } from "react-router-dom";
+import { getUIDv4 } from "../utils/common";
+import { resetUserId } from "../actions/userId.actions";
 
 const ClearPreferencesButton  = ({buttonStyle}) => {
-    const { likedSongs, skippedSongs } = useSelector(state => state);
     const dispatch = useDispatch();
-    const history = useHistory();
 
     return (
         <button 
-            className={(likedSongs.length === 0 && skippedSongs.length === 0) ? 
-                buttonStyle + " cursor-not-allowed	" 
-                : buttonStyle}
-            disabled={likedSongs.length === 0 && skippedSongs.length === 0}
+            className={buttonStyle}
             onClick={() => {
+                dispatch(resetUserId(getUIDv4()))
                 dispatch(clearLikedSongsList());
                 dispatch(clearSkippedSongsList());
             }}>

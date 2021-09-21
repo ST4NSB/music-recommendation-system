@@ -45,6 +45,10 @@ export const removeSkippedSong = (songId) => {
     localStorage.setItem("skippedSongs", JSON.stringify(newSongs));
 }
 
+export const resetUserId = (newUID) => {
+    localStorage.setItem("userId", JSON.stringify(newUID));
+}
+
 export const getUserId = () => {
     createUserDetails();
     return JSON.parse(localStorage.getItem('userId'));

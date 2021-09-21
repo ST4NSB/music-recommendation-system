@@ -1,0 +1,1 @@
+export const RESET_USERID = 'RESET_USERID';
