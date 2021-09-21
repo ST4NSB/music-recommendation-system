@@ -8,17 +8,28 @@ import { getNextSong, likeCurrentSong } from "../actions/currentSong.actions";
 import { addSkippedSongs } from "../actions/skippedSongs.actions";
 import { addLikedSong } from "../actions/likedSongs.actions";
 import { removeSkippedSongFromList } from "../actions/skippedSongs.actions";
-import { Link } from "react-router-dom";
 import StyledButton from "./StyledButton";
+import { getSingleSkeleton } from "../utils/common";
 
 const RecommendationContext = () => {
-    const { currentSong, likedSongs } = useSelector(state => state);
+    const { userId, currentSong, likedSongs, skippedSongs } = useSelector(state => state);
     const history = useHistory();
     const dispatch = useDispatch();
 
     const getNextitem = async () => {
-        const res = await getNextRecommendedSongApi();
-        dispatch(getNextSong(res));
+        dispatch(getNextSong(getSingleSkeleton('w-4/12')));
+
+        const body = {
+            'userId': userId,
+            'liked': likedSongs,
+            'skipped': skippedSongs
+        };
+
+        await getNextRecommendedSongApi(body).then(response => {
+            const res = response.data;
+            document.title = res.name;
+            dispatch(getNextSong(res));
+        });
     }
 
     const addLikedItem = () => {
@@ -45,6 +56,7 @@ const RecommendationContext = () => {
                         id={currentSong.id}
                         name={currentSong.name}
                         youtubeId={currentSong.youtubeId}
+                        emptyItem={currentSong.emptyItem}
                         likeClick={async () => {
                             dispatch(likeCurrentSong());
                             addLikedItem();
@@ -54,10 +66,11 @@ const RecommendationContext = () => {
 
             <StyledButton text="NEXT &rsaquo;&rsaquo;"
                           onClickEvent={async () => {
-                              if (!currentSong.liked) {
-                                  dispatch(addSkippedSongs([currentSong.id]));
-                              }
-                              await getNextitem();
+                            dispatch(getNextSong(getSingleSkeleton('w-4/12')));
+                            if (!currentSong.liked) {
+                                dispatch(addSkippedSongs([currentSong.id]));
+                            }
+                            await getNextitem();
                           }} />
         </div>
     );

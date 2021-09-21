@@ -7,6 +7,7 @@ import { getSearchResults } from "../actions/searchResults.actions";
 import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSongs.actions";
 import { addLikedSong } from "../actions/likedSongs.actions";
 import StyledButton from "./StyledButton";
+import { getResultsSkeleton } from "../utils/common";
 
 const SearchContext = () => {
     const { userId, likedSongs, skippedSongs, searchText, searchResults } = useSelector(state => state);
@@ -19,28 +20,27 @@ const SearchContext = () => {
     }, [searchText])
 
     const getRandomItems = async () => {
+        dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
+
         const body = {
             'userId': userId,
             'liked': likedSongs,
             'skipped': skippedSongs
         };
 
-        // del
-        const res = await getRandomSongsApi(body);
-        dispatch(getSearchResults(res));
-        dispatch(addSkippedSongs(res.map(x => x.id)));
-        // del
-
-        // await getRandomSongsApi(body).then(response => {
-        //     const res = response.data;
-        //     dispatch(getSearchResults(res));
-        //     dispatch(addSkippedSongs(res.map(x => x.id)));
-        // });        
+        await getRandomSongsApi(body).then(response => {
+            const res = response.data;
+            dispatch(getSearchResults(res));
+            dispatch(addSkippedSongs(res.map(x => x.id)));
+        });        
     }
 
     const getResultItems = async () => {
-        const res = await getSongsApi(searchText);
-        dispatch(getSearchResults(res));
+        dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
+        await getSongsApi(searchText).then(response => {
+            const res = response.data;
+            dispatch(getSearchResults(res));
+        });
     }
 
     const addLikedItem = (id) => {
@@ -67,6 +67,7 @@ const SearchContext = () => {
                                 id={x.id} 
                                 name={x.name} 
                                 youtubeId={x.youtubeId}
+                                emptyItem={x.emptyItem}
                                 likeClick={addLikedItem}
                                 itemClasses={'w-1/12 flex-basis-3'} />)}
             </div>

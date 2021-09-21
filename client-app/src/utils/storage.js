@@ -1,4 +1,4 @@
-import getUIDv4 from "./common";
+import { getUIDv4 } from "./common";
 
 const createUserDetails = () => {
     const uid = JSON.parse(localStorage.getItem('userId'));

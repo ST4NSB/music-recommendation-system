@@ -5,6 +5,7 @@ import { getSongsApi } from "../utils/apiRequests";
 import { getSearchResults } from "../actions/searchResults.actions";
 import { useSelector } from "react-redux";
 import ClearPreferencesButton from "./ClearPreferencesButton";
+import { getResultsSkeleton } from "../utils/common";
 import logo from "../images/logo.png";
 
 const Header = () => {
@@ -17,8 +18,11 @@ const Header = () => {
     const navButtonActive = " bg-theme-black rounded-md text-theme-white";
 
     const getResultItems = async () => {
-        const res = await getSongsApi(searchText);
-        dispatch(getSearchResults(res));
+        dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
+        await getSongsApi(searchText).then(response => {
+            const res = response.data;
+            dispatch(getSearchResults(res));
+        });
     }
 
     const showSearchBar = () => {
@@ -39,9 +43,9 @@ const Header = () => {
     const showAnimation = () => {
         if (likedSongs.length >= 3)
             return (
-                <span class="h-3 w-3 relative bottom-7 left-1">
-                    <span class="animate-ping absolute top-3 inline-flex h-3 w-3 rounded-full bg-purple-400 opacity-75"></span>
-                    <span class=" inline-flex absolute top-3 rounded-full h-3 w-3 bg-purple-500"></span>
+                <span className="h-3 w-3 relative bottom-7 left-1">
+                    <span className="animate-ping absolute top-3 inline-flex h-3 w-3 rounded-full bg-purple-400 opacity-75"></span>
+                    <span className=" inline-flex absolute top-3 rounded-full h-3 w-3 bg-purple-500"></span>
                 </span> 
             );
     }
