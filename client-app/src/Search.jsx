@@ -4,7 +4,7 @@ import Main from "./components/Main";
 import { useEffect } from "react";
 
 const Search = () => {
-    useEffect(async () => {
+    useEffect(() => {
         document.title = "Search - Music Recommender System";
     }, []);
 

@@ -6,7 +6,7 @@ const reducer = (state = getUserSkippedSongs(), action) => {
     switch (action.type) {
         case ADD_SKIPPED: {
             setSkippedSongs(action.payload);
-            action.payload.map(x => {
+            action.payload.forEach(x => {
                 if (!state.includes(x)) {
                     state.push(x);
                 }

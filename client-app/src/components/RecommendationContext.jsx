@@ -37,8 +37,9 @@ const RecommendationContext = () => {
         dispatch(removeSkippedSongFromList(currentSong.id));
     }
 
-    useEffect(async () => {
-        await getNextitem();
+    useEffect(() => {
+        const fetchAsync = async () => await getNextitem();
+        fetchAsync();
     }, []);
 
     if (likedSongs.length < 3) 

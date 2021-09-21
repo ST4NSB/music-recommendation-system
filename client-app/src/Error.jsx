@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const Error = () => {
     
-    useEffect(async () => {
+    useEffect(() => {
         document.title = "Error - " + document.title;
     }, []);
 

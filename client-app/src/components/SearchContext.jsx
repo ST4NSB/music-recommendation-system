@@ -13,9 +13,10 @@ const SearchContext = () => {
     const { userId, likedSongs, skippedSongs, searchText, searchResults } = useSelector(state => state);
     const dispatch = useDispatch();
 
-    useEffect(async () => {
+    useEffect(() => {
         if (searchText.trim().length === 0) {
-            await getRandomItems();
+            const fetchAsync = async () => await getRandomItems();
+            fetchAsync();
         }
     }, [searchText])
 
