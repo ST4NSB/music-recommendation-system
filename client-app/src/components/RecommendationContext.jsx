@@ -38,6 +38,7 @@ const RecommendationContext = () => {
     }
 
     useEffect(() => {
+        document.title = "Music Recommender System";
         const fetchAsync = async () => await getNextitem();
         fetchAsync();
     }, []);

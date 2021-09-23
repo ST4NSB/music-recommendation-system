@@ -10,4 +10,8 @@
     .left-4per {
         left: calc(4% + 9px);
     }
+
+    .left-middle {
+        left: 40%;
+    }
 }

@@ -2,10 +2,11 @@ import './css/index.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
-import store from './store'
-import { Provider } from 'react-redux'
+import store from './store';
+import { Provider } from 'react-redux';
+import SuccessPortal from './components/SuccessPortal';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -16,6 +17,15 @@ ReactDOM.render(
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
+);
+
+ReactDOM.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <SuccessPortal />
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('modal-root')
 );
 
 // If you want to start measuring performance in your app, pass a function

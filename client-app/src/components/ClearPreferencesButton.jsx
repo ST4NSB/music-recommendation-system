@@ -1,19 +1,27 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearLikedSongsList } from '../actions/likedSongs.actions'
 import { clearSkippedSongsList } from "../actions/skippedSongs.actions";
 import { getUIDv4 } from "../utils/common";
 import { resetUserId } from "../actions/userId.actions";
+import { deleteUser } from "../utils/apiRequests";
+import { useState } from "react";
+import SuccessPortal from "./SuccessPortal";
+import { showPortal } from "../actions/portalState.actions";
 
 const ClearPreferencesButton  = ({buttonStyle}) => {
+    const userId = useSelector(state => state.userId);
     const dispatch = useDispatch();
 
     return (
-        <button 
+        <button
             className={buttonStyle}
-            onClick={() => {
-                dispatch(resetUserId(getUIDv4()))
-                dispatch(clearLikedSongsList());
-                dispatch(clearSkippedSongsList());
+            onClick={async () => {
+                await deleteUser(userId).then(_ => {
+                    dispatch(resetUserId(getUIDv4()));
+                    dispatch(clearLikedSongsList());
+                    dispatch(clearSkippedSongsList());
+                    dispatch(showPortal('You cleared your preferences successfully!'));
+                }); 
             }}>
                 Clear Preferences
         </button>

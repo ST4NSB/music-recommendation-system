@@ -1,5 +1,4 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
 import SearchBar from "./SearchBar";
 import ResultItem from "./ResultItem";
 import { getRandomSongsApi, getSongsApi } from "../utils/apiRequests";
@@ -7,6 +6,7 @@ import { getSearchResults } from "../actions/searchResults.actions";
 import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSongs.actions";
 import { addLikedSong } from "../actions/likedSongs.actions";
 import StyledButton from "./StyledButton";
+import { useEffect } from "react";
 import { getResultsSkeleton } from "../utils/common";
 
 const SearchContext = () => {
@@ -63,7 +63,7 @@ const SearchContext = () => {
             </div>
 
             <div className="flex flex-wrap justify-evenly flex-row py-6">
-                {searchResults.map(x => 
+                { searchResults.map(x => 
                     <ResultItem key={x.id}
                                 id={x.id} 
                                 name={x.name} 
