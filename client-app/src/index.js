@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import store from './store';
 import { Provider } from 'react-redux';
-import SuccessPortal from './components/SuccessPortal';
+import Modal from './components/Modal';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -22,7 +22,7 @@ ReactDOM.render(
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <SuccessPortal />
+      <Modal />
     </Provider>
   </React.StrictMode>,
   document.getElementById('modal-root')

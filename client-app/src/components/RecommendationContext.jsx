@@ -40,8 +40,8 @@ const RecommendationContext = () => {
     useEffect(() => {
         document.title = "Music Recommender System";
         const fetchAsync = async () => await getNextitem();
-        fetchAsync();
-    }, []);
+        fetchAsync(); // eslint-disable-next-line 
+    }, []); 
 
     if (likedSongs.length < 3) 
         return (

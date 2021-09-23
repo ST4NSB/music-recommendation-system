@@ -4,8 +4,6 @@ import { clearSkippedSongsList } from "../actions/skippedSongs.actions";
 import { getUIDv4 } from "../utils/common";
 import { resetUserId } from "../actions/userId.actions";
 import { deleteUser } from "../utils/apiRequests";
-import { useState } from "react";
-import SuccessPortal from "./SuccessPortal";
 import { showPortal } from "../actions/portalState.actions";
 
 const ClearPreferencesButton  = ({buttonStyle}) => {

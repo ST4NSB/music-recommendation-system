@@ -17,8 +17,8 @@ const SearchContext = () => {
         if (searchText.trim().length === 0) {
             const fetchAsync = async () => await getRandomItems();
             fetchAsync();
-        }
-    }, [searchText])
+        } // eslint-disable-next-line
+    }, [])
 
     const getRandomItems = async () => {
         dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
