@@ -28,3 +28,8 @@ class DBContext:
     def get_liked_nr_songs(self, user_id: str) -> int:
         user_recs = self.db['user_recommended_songs']
         return int(user_recs.find_one({'user_id': user_id}, {"_id": 0, 'user_id': 0, 'songs': 0})['liked_songs'])
+
+    def delete_user(self, user_id: str) -> str:
+        user_recs = self.db['user_recommended_songs']
+        if user_recs.find_one({'user_id': user_id}):
+            user_recs.delete_one({'user_id': user_id})

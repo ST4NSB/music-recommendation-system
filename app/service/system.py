@@ -1,4 +1,5 @@
 
+from app.deleteuser import DeleteUser
 from app.repository.elasticsearch_context import ESContext
 from app.repository.db_context import DBContext
 from logging import Logger
@@ -96,6 +97,9 @@ class RecommendationSystem:
     def __compute_feature_value(self, row, normalized_data_tuple, weight) -> float:
         normalized_value = Utils.normalize(row, normalized_data_tuple.min, normalized_data_tuple.max)
         return normalized_value * weight
+
+    def delete_user(self, user_id: str) -> str:
+        self.db.delete_user(user_id)
 
     def get_random_songs(self, processed_songs: Dict) -> List[Dict]:
         search_res = self.es.get_random_items()

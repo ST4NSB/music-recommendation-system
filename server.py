@@ -1,3 +1,4 @@
+from app.deleteuser import DeleteUser
 from app.repository.elasticsearch_context import ESContext
 from elasticsearch.client import Elasticsearch
 from app.getsongs import GetSongs
@@ -30,6 +31,7 @@ rs = RecommendationSystem(logger=app.logger, db=mongo_db, es=es, cfg=cfg, rpath=
 api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 api.add_resource(RandomSongs, '/api/recommender/randomsongs', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 api.add_resource(GetSongs, '/api/recommender/getsongs/<name>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
+api.add_resource(DeleteUser, '/api/recommender/deleteuser/<userId>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 
 if __name__ =="__main__": 
     app.run(debug = True)
