@@ -44,20 +44,20 @@ const RecommendationContext = () => {
         if (likedSongs.length >= minSongs) {
             const fetchAsync = async () => await getNextitem();
             fetchAsync(); // eslint-disable-next-line 
-        }
+        } // eslint-disable-next-line
     }, []); 
 
     if (likedSongs.length < minSongs) 
         return (
-            <div className="flex flex-col justify-center items-center pt-14">
-                <div>You need to like at least {minSongs} songs!</div>
+            <div className="flex flex-col justify-center items-center pt-12">
+                <p className="text-theme-white text-xl py-4">You need to like at least <span className="text-purple-300">{minSongs}</span> songs before getting recommended songs!</p>
                 <StyledButton text="Keep browsing.."
                               onClickEvent={() => history.push('/search')} />
             </div>
         );
     else return (
         <div className="flex flex-col justify-center items-center pt-14">
-            <p>System recommended this song, hit Like if you like it or next if you want to get next song</p>
+            <p className="text-theme-white text-xl pt-3 pb-7">System recommended this song, hit <span className="text-purple-300"> Like </span> if you like it or <span className="text-theme-gray"> NEXT </span> if you want another recommendation</p>
             <ResultItem key={currentSong.id}
                         id={currentSong.id}
                         name={currentSong.name}

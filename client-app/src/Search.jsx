@@ -12,8 +12,8 @@ const Search = () => {
         <>
             <Header />
             <Main>
-                <h1 className="flex flex-col justify-center items-center text-theme-white font-bold text-3xl pb-7">
-                    Search your favorite songs or Get random songs
+                <h1 className="flex flex-col justify-center items-center text-theme-white font-bold text-2xl pb-7">
+                    Search for your favorite artists/songs or browse random songs
                 </h1>
                 <SearchContext />
             </Main>
