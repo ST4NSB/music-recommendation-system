@@ -7,6 +7,7 @@ import { addSkippedSongs, removeSkippedSongFromList } from "../actions/skippedSo
 import { addLikedSong } from "../actions/likedSongs.actions";
 import StyledButton from "./StyledButton";
 import { useEffect } from "react";
+import { showPortal } from "../actions/portalState.actions";
 import { getResultsSkeleton } from "../utils/common";
 
 const SearchContext = () => {
@@ -33,7 +34,7 @@ const SearchContext = () => {
             const res = response.data;
             dispatch(getSearchResults(res));
             dispatch(addSkippedSongs(res.map(x => x.id)));
-        });        
+        }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));        
     }
 
     const getResultItems = async () => {
@@ -41,7 +42,7 @@ const SearchContext = () => {
         await getSongsApi(searchText).then(response => {
             const res = response.data;
             dispatch(getSearchResults(res));
-        });
+        }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));
     }
 
     const addLikedItem = (id) => {

@@ -10,11 +10,13 @@ import { addLikedSong } from "../actions/likedSongs.actions";
 import { removeSkippedSongFromList } from "../actions/skippedSongs.actions";
 import StyledButton from "./StyledButton";
 import { getSingleSkeleton } from "../utils/common";
+import { showPortal } from "../actions/portalState.actions";
 
 const RecommendationContext = () => {
     const { userId, currentSong, likedSongs, skippedSongs } = useSelector(state => state);
     const history = useHistory();
     const dispatch = useDispatch();
+    const minSongs = parseInt(process.env.REACT_APP_MIN_SONGS);
 
     const getNextitem = async () => {
         dispatch(getNextSong(getSingleSkeleton('w-4/12')));
@@ -29,7 +31,7 @@ const RecommendationContext = () => {
             const res = response.data;
             document.title = res.name;
             dispatch(getNextSong(res));
-        });
+        }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));
     }
 
     const addLikedItem = () => {
@@ -39,14 +41,16 @@ const RecommendationContext = () => {
 
     useEffect(() => {
         document.title = "Music Recommender System";
-        const fetchAsync = async () => await getNextitem();
-        fetchAsync(); // eslint-disable-next-line 
+        if (likedSongs.length >= minSongs) {
+            const fetchAsync = async () => await getNextitem();
+            fetchAsync(); // eslint-disable-next-line 
+        }
     }, []); 
 
-    if (likedSongs.length < 3) 
+    if (likedSongs.length < minSongs) 
         return (
-            <div className="flex flex-col justify-center items-center">
-                <div>You need to like at least 3 songs!</div>
+            <div className="flex flex-col justify-center items-center pt-14">
+                <div>You need to like at least {minSongs} songs!</div>
                 <StyledButton text="Keep browsing.."
                               onClickEvent={() => history.push('/search')} />
             </div>

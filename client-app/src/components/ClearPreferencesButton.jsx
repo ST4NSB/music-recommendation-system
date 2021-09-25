@@ -18,8 +18,8 @@ const ClearPreferencesButton  = ({buttonStyle}) => {
                     dispatch(resetUserId(getUIDv4()));
                     dispatch(clearLikedSongsList());
                     dispatch(clearSkippedSongsList());
-                    dispatch(showPortal('You cleared your preferences successfully!'));
-                }); 
+                    dispatch(showPortal({message:'You cleared your preferences successfully!', type:'success'}));
+                }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'}))); 
             }}>
                 Clear Preferences
         </button>

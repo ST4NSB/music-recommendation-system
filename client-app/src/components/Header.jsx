@@ -6,6 +6,7 @@ import { getSearchResults } from "../actions/searchResults.actions";
 import { useSelector } from "react-redux";
 import ClearPreferencesButton from "./ClearPreferencesButton";
 import { getResultsSkeleton } from "../utils/common";
+import { showPortal } from "../actions/portalState.actions";
 import logo from "../images/logo.png";
 
 const Header = () => {
@@ -13,6 +14,7 @@ const Header = () => {
     const location = useLocation();
     const history = useHistory();
     const dispatch = useDispatch();
+    const minSongs = parseInt(process.env.REACT_APP_MIN_SONGS);
 
     const navButtonStyle = "mx-6 p-3 text-theme-gray hover:text-theme-white whitespace-nowrap";
     const navButtonActive = " bg-theme-black rounded-md text-theme-white";
@@ -22,7 +24,7 @@ const Header = () => {
         await getSongsApi(searchText).then(response => {
             const res = response.data;
             dispatch(getSearchResults(res));
-        });
+        }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));
     }
 
     const showSearchBar = () => {
@@ -41,7 +43,7 @@ const Header = () => {
     }
 
     const showAnimation = () => {
-        if (likedSongs.length >= 3)
+        if (likedSongs.length >= minSongs)
             return (
                 <span className="h-3 w-3 relative bottom-7 left-1">
                     <span className="animate-ping absolute top-3 inline-flex h-3 w-3 rounded-full bg-purple-400 opacity-75"></span>
