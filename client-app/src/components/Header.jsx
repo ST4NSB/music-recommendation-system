@@ -16,9 +16,6 @@ const Header = () => {
     const dispatch = useDispatch();
     const minSongs = parseInt(process.env.REACT_APP_MIN_SONGS);
 
-    const navButtonStyle = "mx-6 p-3 text-theme-gray hover:text-theme-white whitespace-nowrap";
-    const navButtonActive = " bg-theme-black rounded-md text-theme-white";
-
     const getResultItems = async (textInput) => {
         dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
         await getSongsApi(textInput).then(response => {
@@ -38,10 +35,10 @@ const Header = () => {
             </div>
 
             <nav className="w-full">
-                <button className={`align-middle ${navButtonStyle}`}><a href='https://github.com/ST4NSB/music-recommendation-system'><img className="h-6 w-6" alt="github logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" /></a></button>
-                <Link className={(location.pathname === '/search') ? navButtonStyle + navButtonActive : navButtonStyle } to='/search'>Browse</Link>
-                <ClearPreferencesButton buttonStyle={navButtonStyle} />
-                <Link className={(location.pathname === '/recommendations') ? navButtonStyle + navButtonActive : navButtonStyle } to='/recommendations'>
+                <button className="align-middle nav-button-normal"><a href='https://github.com/ST4NSB/music-recommendation-system'><img className="h-6 w-6" alt="github logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" /></a></button>
+                <Link className={`nav-button-normal ${(location.pathname === '/search') ? 'nav-button-active' : '' }`} to='/search'>Browse</Link>
+                <ClearPreferencesButton buttonStyle='nav-button-normal' />
+                <Link className={`nav-button-normal ${(location.pathname === '/recommendations') ? 'nav-button-active' : '' }`} to='/recommendations'>
                     Get Recommendations  
                     { likedSongs.length >= minSongs 
                         && <span className="h-3 w-3 relative bottom-7 left-1">

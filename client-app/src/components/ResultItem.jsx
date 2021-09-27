@@ -6,7 +6,7 @@ const ResultItem = ({id, name, youtubeId, likeClick, itemClasses, emptyItem}) =>
     
     return (emptyItem) ?
         (
-            <div id={id} className={`mb-10 bg-theme-dark-xs shadow-xl rounded-lg ${itemClasses}`}>
+            <div id={id} className={`mb-10 bg-theme-dark-xs shadow-xl rounded-lg animate-popup ${itemClasses}`}>
                 <div className="border border-purple-500 shadow rounded-md p-4 mx-auto">
                     <div className="animate-pulse flex space-x-4">
                         <div className="flex-1 space-y-4 py-1">
