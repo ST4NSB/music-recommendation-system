@@ -4,11 +4,11 @@
 
 @layer components {
     .question {
-        @apply text-purple-300 text-2xl font-bold py-3
+        @apply text-purple-300 text-2xl font-bold py-3 mobile:text-xl
     }
 
     .nav-button-normal {
-        @apply mx-6 p-3 text-theme-gray hover:text-theme-white whitespace-nowrap
+        @apply mx-6 p-3 text-theme-gray hover:text-theme-white whitespace-nowrap tablet:my-1
     }
 
     .nav-button-active {

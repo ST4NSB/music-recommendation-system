@@ -76,7 +76,7 @@ const SearchContext = () => {
                                 youtubeId={x.youtubeId}
                                 emptyItem={x.emptyItem}
                                 likeClick={addLikedItem}
-                                itemClasses={'w-1/12 flex-basis-3'} />)}
+                                itemClasses={"w-1/12 flex-basis-3 tablet:min-w-45 mobile:min-w-90"} />)}
             </div>
         </>
     );

@@ -17,8 +17,8 @@ const Home = () => {
             <Header />
             <Main>
                 <div className="flex flex-col justify-center items-center pt-12">
-                    <h1 className="text-purple-600 text-6xl font-bold uppercase">Music Recommender System</h1>
-                    <div className="text-theme-white text-xl py-5 text-center w-6/12">
+                    <h1 className="text-purple-600 text-6xl font-bold uppercase text-center tablet:text-5xl mobile:text-3xl">Music Recommender System</h1>
+                    <div className="text-theme-white text-xl py-5 text-center w-6/12 tablet:w-8/12 mobile:w-10/12 mobile:text-base">
                         <p className="question">&#10070; What is this about? &#10070;</p>
                         <p>A web-app that recommends you songs based on what songs you like.</p>
                         <p className="question">&#10070; How this works? &#10070;</p>

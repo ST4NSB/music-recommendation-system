@@ -3,12 +3,18 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      minWidth: {
+        '45': '45%',
+        '90': '90%',
+      },
       fontFamily: {
         sans: ['Helvetica', 'Verdana', 'Arial', 'sans-serif'],
       },
       screens: {
-        'mobile': '0px',
-        // => @media (min-width: 0px) { ... }
+        'tablet': { 'max': '1326px'},
+        // => @media (max-width: 1326px) { ... }
+        'mobile': { 'max': '800px'},
+        // => @media (max-width: 800px) { ... }
       },
       colors: {
         theme: {

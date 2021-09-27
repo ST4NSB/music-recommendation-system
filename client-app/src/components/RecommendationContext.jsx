@@ -49,15 +49,15 @@ const RecommendationContext = () => {
 
     return (likedSongs.length < minSongs) ?
         (
-            <div className="flex flex-col justify-center items-center pt-12">
-                <p className="text-theme-white text-xl py-4">You need to like at least <span className="text-purple-300">{minSongs}</span> songs before getting recommended songs!</p>
+            <div className="flex flex-col justify-center items-center pt-12 text-center">
+                <p className="text-theme-white text-xl py-4 tablet:text-lg mobile:text-base">You need to like at least <span className="text-purple-300">{minSongs}</span> songs before getting recommended songs!</p>
                 <StyledButton text="Keep browsing.."
                               onClickEvent={() => history.push('/search')} />
             </div>
         )
     :   (
-            <div className="flex flex-col justify-center items-center pt-14">
-                <p className="text-theme-white text-xl pt-3 pb-7">System recommended this song, hit <span className="text-purple-300"> Like </span> if you like it or <span className="text-theme-gray"> NEXT </span> if you want another recommendation</p>
+            <div className="flex flex-col justify-center items-center pt-14 text-center">
+                <p className="text-theme-white text-xl pt-3 pb-7 tablet:text-lg mobile:text-base">System recommended this song, hit <span className="text-purple-300"> Like </span> if you like it or <span className="text-theme-gray"> NEXT </span> if you want another recommendation</p>
                 <ResultItem key={currentSong.id}
                             id={currentSong.id}
                             name={currentSong.name}
@@ -67,7 +67,7 @@ const RecommendationContext = () => {
                                 dispatch(likeCurrentSong());
                                 addLikedItem();
                             }}
-                            itemClasses={'w-4/12'} />
+                            itemClasses={'w-5/12 tablet:w-7/12 mobile:w-9/12'} />
 
                 <StyledButton text="NEXT &rsaquo;&rsaquo;"
                             onClickEvent={async () => {

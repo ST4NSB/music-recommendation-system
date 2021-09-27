@@ -25,7 +25,7 @@ const Header = () => {
     }
 
     return (
-        <header className="font-sans sticky top-0 z-50 bg-theme-dark-xm md:flex md:items-center p-4 pb-0 shadow-lg md:pb-4 mobile:pb-5">
+        <header className="font-sans sticky top-0 z-50 bg-theme-dark-xm md:flex md:items-center p-4 pb-0 shadow-lg md:pb-4">
             <div className="mb-4 md:mb-0">
                     <a className="no-underline text-grey-darkest" href="/">
                         <img src=""
@@ -49,21 +49,23 @@ const Header = () => {
                 </Link>
             </nav>
              
-            { location.pathname !== '/search' 
-                &&  <div className="w-full">
-                        <SearchBar 
-                            layoutClasses="shadow p-0 m-0 md:w-7/12 md:float-right sm:w-full" 
-                            inputWidthClass="w-full"
-                            buttonPosition="left-1 top-1"
-                            action={async (textInput) => {
-                                    history.push({pathname: '/search', state: {searchInput: textInput}}); 
-                                    await getResultItems(textInput);
+            <div className="w-full mobile:py-5">
+                { location.pathname !== '/search' 
+                    &&  
+                            <SearchBar 
+                                layoutClasses="shadow p-0 m-0 md:w-7/12 md:float-right sm:w-full" 
+                                inputWidthClass="w-full"
+                                buttonPosition="left-1 top-1"
+                                action={async (textInput) => {
+                                        history.push({pathname: '/search', state: {searchInput: textInput}}); 
+                                        await getResultItems(textInput);
+                                    }
                                 }
-                            }
-                            inputDefaultValue={''}
-                            />
-                    </div>
-            }
+                                inputDefaultValue={''}
+                                />
+                        
+                }
+            </div>
         </header>
     );
 }
