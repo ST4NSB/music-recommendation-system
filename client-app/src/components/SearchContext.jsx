@@ -9,10 +9,14 @@ import StyledButton from "./StyledButton";
 import { useEffect } from "react";
 import { showPortal } from "../actions/portalState.actions";
 import { getResultsSkeleton } from "../utils/common";
+import { useState } from "react";
+import { useLocation } from "react-router";
 
 const SearchContext = () => {
-    const { userId, likedSongs, skippedSongs, searchText, searchResults } = useSelector(state => state);
+    const { userId, likedSongs, skippedSongs, searchResults } = useSelector(state => state);
     const dispatch = useDispatch();
+    const location = useLocation();
+    const [searchText, setSearchText] = useState(location.state?.searchInput?? '');
 
     useEffect(() => {
         if (searchText.trim().length === 0) {
@@ -37,9 +41,10 @@ const SearchContext = () => {
         }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));        
     }
 
-    const getResultItems = async () => {
+    const getResultItems = async (textInput) => {
+        setSearchText(textInput);
         dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
-        await getSongsApi(searchText).then(response => {
+        await getSongsApi(textInput).then(response => {
             const res = response.data;
             dispatch(getSearchResults(res));
         }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));
@@ -56,7 +61,7 @@ const SearchContext = () => {
                        inputWidthClass="w-11/12"
                        buttonPosition="left-4per top-1"
                        action={getResultItems}
-                       inputValue={searchText} />
+                       inputDefaultValue={searchText} />
             
             <div className="flex flex-col justify-center items-center py-3">
                 <StyledButton text="Get random songs"

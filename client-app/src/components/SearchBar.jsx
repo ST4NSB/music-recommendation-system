@@ -1,34 +1,29 @@
-import { changeSearchText } from "../actions/searchText.actions";
-import { useDispatch } from "react-redux";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import { useSelector } from "react-redux";
+import { useState } from "react";
 
-export const SearchBar = ({layoutClasses, inputWidthClass, buttonPosition, action, inputValue}) => {
-    const searchText = useSelector(state => state.searchText);
-    const dispatch = useDispatch();
+export const SearchBar = ({layoutClasses, inputWidthClass, buttonPosition, action, inputDefaultValue}) => {
+    const [inputText, setInputText] = useState(inputDefaultValue?? '');
 
     return (
         <div className={`flex relative ${layoutClasses}`}>
             <input type="search" 
                    name="nav_search"
-                   value={inputValue}
+                   value={inputText}
                    className={`pl-10 pt-2 pb-2 m-0 focus:outline-none bg-theme-searchbar text-theme-white rounded-md ${inputWidthClass}`}
                    placeholder="Search" 
-                   onChange={(e) => {
-                       dispatch(changeSearchText(e.target.value));
-                   }}
+                   onChange={(e) => setInputText(e.target.value)}
                    onKeyDown={(e) => {
-                       if (e.key === 'Enter' && searchText.trim().length !== 0) {
-                           action();
+                       if (e.key === 'Enter' && inputText.trim().length !== 0) {
+                           action(inputText);
                        }
                    }} />
 
             <button type="submit" 
                     className={`text-theme-gray absolute w-auto flex justify-end items-center text-darken p-2 hover:text-theme-dark-xm ${buttonPosition}`}
                     onClick={() => {
-                        if (searchText.trim().length !== 0) {
-                            action();
+                        if (inputText.trim().length !== 0) {
+                            action(inputText);
                         }
                     }}>
                         <FontAwesomeIcon icon={faSearch} />

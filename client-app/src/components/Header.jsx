@@ -10,7 +10,7 @@ import { showPortal } from "../actions/portalState.actions";
 import logo from "../images/logo.png";
 
 const Header = () => {
-    const { searchText, likedSongs } = useSelector(state => state);
+    const { likedSongs } = useSelector(state => state);
     const location = useLocation();
     const history = useHistory();
     const dispatch = useDispatch();
@@ -19,37 +19,12 @@ const Header = () => {
     const navButtonStyle = "mx-6 p-3 text-theme-gray hover:text-theme-white whitespace-nowrap";
     const navButtonActive = " bg-theme-black rounded-md text-theme-white";
 
-    const getResultItems = async () => {
+    const getResultItems = async (textInput) => {
         dispatch(getSearchResults(getResultsSkeleton('w-1/12 flex-basis-3')));
-        await getSongsApi(searchText).then(response => {
+        await getSongsApi(textInput).then(response => {
             const res = response.data;
             dispatch(getSearchResults(res));
         }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));
-    }
-
-    const showSearchBar = () => {
-        if (location.pathname !== '/search') {
-            return ( <SearchBar 
-                        layoutClasses="shadow p-0 m-0 md:w-7/12 md:float-right sm:w-full" 
-                        inputWidthClass="w-full"
-                        buttonPosition="left-1 top-1"
-                        action={async () => {
-                                if (searchText.trim().length !== 0) {
-                                    history.push('/search'); 
-                                    await getResultItems();
-                            }
-                        }} />);
-        }
-    }
-
-    const showAnimation = () => {
-        if (likedSongs.length >= minSongs)
-            return (
-                <span className="h-3 w-3 relative bottom-7 left-1">
-                    <span className="animate-ping absolute top-3 inline-flex h-3 w-3 rounded-full bg-purple-400 opacity-75"></span>
-                    <span className=" inline-flex absolute top-3 rounded-full h-3 w-3 bg-purple-500"></span>
-                </span> 
-            );
     }
 
     return (
@@ -68,13 +43,30 @@ const Header = () => {
                 <ClearPreferencesButton buttonStyle={navButtonStyle} />
                 <Link className={(location.pathname === '/recommendations') ? navButtonStyle + navButtonActive : navButtonStyle } to='/recommendations'>
                     Get Recommendations  
-                    {showAnimation()}
+                    { likedSongs.length >= minSongs 
+                        && <span className="h-3 w-3 relative bottom-7 left-1">
+                                <span className="animate-ping absolute top-3 inline-flex h-3 w-3 rounded-full bg-purple-400 opacity-75"></span>
+                                <span className=" inline-flex absolute top-3 rounded-full h-3 w-3 bg-purple-500"></span>
+                            </span> 
+                    }
                 </Link>
             </nav>
-         
-            <div className="w-full">
-                {showSearchBar()}
-            </div>
+             
+            { location.pathname !== '/search' 
+                &&  <div className="w-full">
+                        <SearchBar 
+                            layoutClasses="shadow p-0 m-0 md:w-7/12 md:float-right sm:w-full" 
+                            inputWidthClass="w-full"
+                            buttonPosition="left-1 top-1"
+                            action={async (textInput) => {
+                                    history.push({pathname: '/search', state: {searchInput: textInput}}); 
+                                    await getResultItems(textInput);
+                                }
+                            }
+                            inputDefaultValue={''}
+                            />
+                    </div>
+            }
         </header>
     );
 }

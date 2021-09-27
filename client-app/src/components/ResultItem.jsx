@@ -4,8 +4,8 @@ import LikeButton from "./LikeButton";
 
 const ResultItem = ({id, name, youtubeId, likeClick, itemClasses, emptyItem}) => {
     
-    if (emptyItem) 
-        return (
+    return (emptyItem) ?
+        (
             <div id={id} className={`mb-10 bg-theme-dark-xs shadow-xl rounded-lg ${itemClasses}`}>
                 <div className="border border-purple-500 shadow rounded-md p-4 mx-auto">
                     <div className="animate-pulse flex space-x-4">
@@ -22,9 +22,9 @@ const ResultItem = ({id, name, youtubeId, likeClick, itemClasses, emptyItem}) =>
                     </div>
                 </div>
             </div>
-        );
-    else
-        return (
+        )
+    :
+        (
             <div id={id} className={`mb-10 bg-theme-dark-xs shadow-xl rounded-lg ${itemClasses}`}>
                 <div className="rounded-xl shadow-xl w-11/12 h-96 relative overflow-hidden mx-auto mt-5">
                     <iframe title={name} className='w-full h-96' src={`https://www.youtube.com/embed/${youtubeId}`} />
