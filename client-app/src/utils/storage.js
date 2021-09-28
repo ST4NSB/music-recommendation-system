@@ -20,12 +20,8 @@ export const setLikedSongs = (liked) => {
 export const setSkippedSongs = (skipped) => {
     createUserDetails();
     const skippedSongs = JSON.parse(localStorage.getItem('skippedSongs'));
-    skipped.forEach(x => {
-        if (!skippedSongs.includes(x)) {
-            skippedSongs.push(x);
-        }
-    });
-    localStorage.setItem("skippedSongs", JSON.stringify(skippedSongs));
+    const skippedFiltered = skipped.filter(x => !skippedSongs.includes(x));
+    localStorage.setItem("skippedSongs", JSON.stringify([...skippedSongs, ...skippedFiltered]));
 }
 
 export const clearLikedSongs = () => {
