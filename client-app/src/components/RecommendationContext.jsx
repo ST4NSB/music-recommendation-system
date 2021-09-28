@@ -31,6 +31,7 @@ const RecommendationContext = () => {
             const res = response.data;
             document.title = res.name;
             dispatch(getNextSong(res));
+            dispatch(addSkippedSongs([res.id]));
         }).catch(err => dispatch(showPortal({message: err.toString(), type:'error'})));
     }
 
@@ -71,9 +72,6 @@ const RecommendationContext = () => {
 
                 <StyledButton text="NEXT &rsaquo;&rsaquo;"
                             onClickEvent={async () => {
-                                if (!currentSong.liked) {
-                                    dispatch(addSkippedSongs([currentSong.id]));
-                                }
                                 await getNextitem();
                             }} />
             </div>
