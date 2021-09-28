@@ -6,11 +6,11 @@ dataset:
 
 weights:
     acousticness: 0.125
-    energy: 0.12
-    danceability: 0.1
-    instrumentalness: 0.095
-    tempo: 0.09
-    mode: 0.085
+    energy: 0.13
+    danceability: 0.12
+    instrumentalness: 0.1
+    tempo: 0.095
+    mode: 0.09
     loudness: 0.085
     speechiness: 0.08
     liveness: 0.08
