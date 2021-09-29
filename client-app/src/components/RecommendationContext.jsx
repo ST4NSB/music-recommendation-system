@@ -68,7 +68,7 @@ const RecommendationContext = () => {
                                 dispatch(likeCurrentSong());
                                 addLikedItem();
                             }}
-                            itemClasses={'w-5/12 tablet:w-7/12 mobile:w-9/12'} />
+                            itemClasses={'w-4/12 tablet:w-7/12 mobile:w-9/12'} />
 
                 <StyledButton text="NEXT &rsaquo;&rsaquo;"
                             onClickEvent={async () => {

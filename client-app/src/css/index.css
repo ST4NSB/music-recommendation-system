@@ -4,7 +4,7 @@
 
 @layer components {
     .question {
-        @apply text-purple-300 text-2xl font-bold py-3 mobile:text-xl
+        @apply text-purple-300 text-2xl font-bold pb-3 pt-7 mobile:text-xl
     }
 
     .nav-button-normal {

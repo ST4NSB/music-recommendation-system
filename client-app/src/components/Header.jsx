@@ -28,8 +28,8 @@ const Header = () => {
         <header className="font-sans sticky top-0 z-50 bg-theme-dark-xm md:flex md:items-center p-4 pb-0 shadow-lg md:pb-4">
             <div className="mb-4 md:mb-0">
                     <a className="no-underline text-grey-darkest" href="/">
-                        <img src=""
-                             className="h-22 w-32 text-white"
+                        <img src={logo}
+                             className="h-22 w-44 text-white"
                              alt="header logo" />
                     </a>
             </div>
