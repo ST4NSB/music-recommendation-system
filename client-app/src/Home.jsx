@@ -18,7 +18,7 @@ const Home = () => {
             <Header />
             <Main>
                 <div className="flex flex-col justify-center items-center pt-10">
-                    <img className="h-36" src={logo} />
+                    <img className="h-36" src={logo} alt="logo image" />
                     <div className="text-theme-white text-xl py-5 text-center w-6/12 tablet:w-8/12 mobile:w-10/12 mobile:text-base">
                         <p className="question">&#10070; What is this about? &#10070;</p>
                         <p>A web-app that recommends you songs based on different metrics (tempo, acousticness, energy, etc.) for the songs you like.</p>

@@ -1,10 +1,11 @@
 from typing import Dict
 from pymongo import MongoClient
+import certifi
 
 class DBContext:
     def __init__(self, name: str, passw: str, cluster: str):
         connection_string = f"mongodb+srv://{name}:{passw}@{cluster}.qxsgc.mongodb.net/music_recommender?retryWrites=true&w=majority"
-        client = MongoClient(connection_string)
+        client = MongoClient(connection_string, tlsCAFile=certifi.where())
         self.db = client['music_recommender']
 
     def user_has_songs(self, user_id: str) -> bool:
