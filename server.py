@@ -25,7 +25,7 @@ api = Api(app)
 logging.basicConfig(filename=logger_fn,level=logging.DEBUG)
 
 mongo_db = DBContext(env.DB_USER_NAME, env.DB_USER_PASS, env.DB_CLUSTER)
-es = ESContext(env.ELASTICSEARCH_HOST)
+es = ESContext()
 rs = RecommendationSystem(logger=app.logger, db=mongo_db, es=es, cfg=cfg, rpath=app.root_path, yt_api_key = env.YT_API_KEY)
 
 api.add_resource(NextSong, '/api/recommender/nextsong', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
@@ -34,4 +34,4 @@ api.add_resource(GetSongs, '/api/recommender/getsongs/<name>', resource_class_kw
 api.add_resource(DeleteUser, '/api/recommender/deleteuser/<userId>', resource_class_kwargs={'rs': rs, 'api_key': env.API_KEY})
 
 if __name__ =="__main__": 
-    app.run(debug = True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

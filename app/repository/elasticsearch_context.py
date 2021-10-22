@@ -1,10 +1,13 @@
 import random
 from typing import Dict
 from elasticsearch.client import Elasticsearch
+from elasticsearch import RequestsHttpConnection
 
 class ESContext:
-    def __init__(self, host: str):
-        self.es = Elasticsearch(host)
+    def __init__(self):
+        self.es = Elasticsearch(hosts=[{"host": "host.docker.internal", "port": 9200}], 
+                                connection_class=RequestsHttpConnection, max_retries=1000,
+                                retry_on_timeout=True, request_timeout=30)
 
     def configure(self, songs_dataset: Dict, delete_docs=False) -> None:
         if not self.es.indices.exists(index="music"):
