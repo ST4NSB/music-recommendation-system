@@ -9,7 +9,7 @@ class ESContext:
                                 connection_class=RequestsHttpConnection, max_retries=1000,
                                 retry_on_timeout=True, request_timeout=30)
 
-    def configure(self, songs_dataset: Dict, delete_docs=False) -> None:
+    def configure(self, songs_dataset: Dict, delete_docs=False, bulk_limit=1000) -> None:
         if not self.es.indices.exists(index="music"):
             self.es.indices.create(index='music')
         
@@ -26,6 +26,7 @@ class ESContext:
 
         if self.__get_es_size() == 0:
             body = []
+            bulk_counter = 0
             for key, value in songs_dataset.items():
                 body.append({'index': {'_id': key}})
                 info_body = {
@@ -33,7 +34,11 @@ class ESContext:
                     'artists': value['artists']
                 }
                 body.append(info_body)
-            self.es.bulk(index='music', doc_type='songs', body=body)
+                if bulk_counter % bulk_limit == 0 and bulk_counter != 0:
+                    self.es.bulk(index='music', doc_type='songs', body=body)
+                    body = []
+                bulk_counter += 1
+            self.es.bulk(index='music', doc_type='songs', body=body)  
     
     def get_random_items(self, size: int=300) -> Dict:
         return self.es.search(
