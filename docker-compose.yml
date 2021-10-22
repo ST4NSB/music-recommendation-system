@@ -47,6 +47,18 @@ services:
     networks:
       - elk
 
+  client-frontend:
+    build: ./client-app
+    volumes:
+      - './client-app:/src'
+      - './client-app/node_modules'
+    container_name: client-frontend
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
 volumes:
   elasticsearch-data:
     driver: local
